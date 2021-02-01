@@ -27,16 +27,16 @@
     <form class='container col-6 first'>
         <h4 class='lead'>Member Sign Up (* is required)</h4>
         <div class="form-group">
-            <label for="name">First Name*</label>
+            <label for="fname">First Name*</label>
             <input type="text" class="form-control" id="fname" placeholder="">
         </div>
 
         <div class="form-group">
-            <label for="name">Middle Name</label>
+            <label for="mname">Middle Name</label>
             <input type="text" class="form-control" id="mname" placeholder="">
         </div>
         <div class="form-group">
-            <label for="name">Last Name*</label>
+            <label for="lname">Last Name*</label>
             <input type="text" class="form-control" id="lname" placeholder="">
         </div>
 
@@ -55,16 +55,27 @@
       </form>
       <br>
       <h4 >View/Update Members</h4>
-      <form>
-        <input type="text" placeholder="John" disabled = true>
-        <input type="text" placeholder="A" disabled = true>
-        <input type="text" placeholder="Smith" disabled = true>
-        <input type="email" placeholder="johnsmith@gmail.com" disabled = true>
-        <input type="text" placeholder="12345" disabled = true>
-        <input type="submit" id="update" value="Update">
-        <input type="submit" id="delete" value="Delete">
-        <a href="MemberAccount.html" class = "lead">View Loans/Reservations</a>
-    </form>
+      <table>
+        <thead>
+          <th>First Name</th>
+          <th>Middle Name</th>
+          <th>Last Name</th>
+          <th>Email</th>
+          <th>Zip Code</th>
+        </thead>
+        <tbody>
+          <tr>
+            <td><input type="text" placeholder="John" disabled = true></td>
+            <td><input type="text" placeholder="Smith" disabled = true></td>
+            <td><input type="text" placeholder="A" disabled = true></td>
+            <td><input type="email" placeholder="johnsmith@gmail.com" disabled = true></td>
+            <td><input type="text" placeholder="12345" disabled = true></td>
+            <td><input type="submit" id="update" value="Update"></td>
+            <td> <input type="submit" id="delete" value="Delete"></td>
+            <td><a href="MemberAccount.html" class = "lead">View Loans/Reservations</a></td>
+          </tr>
+      </tbody>
+      </table>
 
     <script src="js/postScript.js"></script>
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>

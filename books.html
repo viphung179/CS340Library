@@ -24,70 +24,88 @@
     </div>
   </nav>
 
-    <form class='container col-6 first'>
-        <h4 class='lead'>Add Book (* is required)</h4>
-        <div class="form-group">
-            <label for="name">Title*</label>
-            <input type="text" class="form-control" id="title" placeholder="">
-        </div>
+  <form class='container col-6 first'>
+    <h4 class='lead'>Add Book (* is required)</h4>
 
-        <div class="form-group">
-            <label for="name">ISBN*</label>
-            <input type="text" class="form-control" id="isbn" placeholder="">
-        </div>
-        <div class="form-group">
-            <label for="name">Author ID*</label>
-            <input type="text" class="form-control" id="auth_id" placeholder="">
-        </div>
+    <div class="form-group">
+      <label for="title">Title*</label>
+      <input type="text" class="form-control" id="title" placeholder="">
+    </div>
 
-        <div class="form-group">
-            <label for="name">Year*</label>
-            <input type="number" class="form-control" id="year" placeholder="">
-        </div>
-        <div class="form-group">
-          <label for="name">Copies Available*</label>
-          <input type="number" class="form-control" id="copies" placeholder="">
-      </div>
-       
-        <button type="submit" class="btn btn-dark" id="submit">Submit</button>
+    <div class="form-group">
+      <label for="isbn">ISBN*</label>
+      <input type="text" class="form-control" id="isbn" placeholder="">
+    </div>
 
-      </form>
-      <br>
-      <form class='container col-6 first'>
-      <h4 class='lead'>Search for book(leave all fields blank to see all books)</h4>
-        <div class="form-group">
-            <label for="name">Title</label>
-            <input type="text" class="form-control" id="title" placeholder="">
-        </div>
+    <div class="form-group">
+      <label for="auth_id">Author ID*</label>
+      <input type="text" class="form-control" id="auth_id" placeholder="">
+    </div>
 
-        <div class="form-group">
-            <label for="name">ISBN</label>
-            <input type="text" class="form-control" id="isbn" placeholder="">
-        </div>
-        <div class="form-group">
-            <label for="name">Author ID</label>
-            <input type="text" class="form-control" id="auth_id" placeholder="">
-        </div>
+    <div class="form-group">
+      <label for="year">Year*</label>
+      <input type="number" class="form-control" id="year" placeholder="">
+    </div>
 
-        <div class="form-group">
-            <label for="name">Year</label>
-            <input type="number" class="form-control" id="year" placeholder="">
-        </div>
-       
-        <button type="submit" class="btn btn-dark" id="submit">Search</button>
-      </form>
-      <br>
-      <h4 >Search Results</h4>
-      <form>
-        <input type="text" placeholder="title" disabled = true>
-        <input type="text" placeholder="isbn" disabled = true>
-        <input type="text" placeholder="author" disabled = true>
-        <input type="email" placeholder="email" disabled = true>
-        <input type="number" placeholder="year" disabled = true>
-        <input type="number" placeholder="copies" disabled = true>
-        <input type="submit" id="update" value="Update">
-        <input type="submit" id="delete" value="Delete">
-    </form>
+    <div class="form-group">
+      <label for="copies">Copies Available*</label>
+      <input type="number" class="form-control" id="copies" placeholder="">
+    </div>
+    
+    <button type="submit" class="btn btn-dark" id="submit">Submit</button>
+
+  </form>
+  <br>
+  <form class='container col-6 first'>
+    <h4 class='lead'>Search for book(leave all fields blank to see all books)</h4>
+
+    <div class="form-group">
+      <label for="name">Title</label>
+      <input type="text" class="form-control" id="title" placeholder="">
+    </div>
+
+    <div class="form-group">
+      <label for="name">ISBN</label>
+      <input type="text" class="form-control" id="isbn" placeholder="">
+    </div>
+
+    <div class="form-group">
+      <label for="name">Author ID</label>
+      <input type="text" class="form-control" id="auth_id" placeholder="">
+    </div>
+
+    <div class="form-group">
+      <label for="name">Year</label>
+      <input type="number" class="form-control" id="year" placeholder="">
+    </div>
+    
+    <button type="submit" class="btn btn-dark" id="submit">Search</button>
+
+  </form>
+  <br>
+  <h4 >Search Results</h4>
+
+  <table>
+    <thead>
+      <th>Title</th>
+      <th>ISBN</th>
+      <th>Author</th>
+      <th>Year</th>
+      <th>Copies Available</th>
+    </thead>
+    <tbody>
+      <tr>
+        <td><input type="text" placeholder="title" disabled = true></td>
+        <td><input type="text" placeholder="isbn" disabled = true></td>
+        <td><input type="text" placeholder="author" disabled = true></td>
+        <td><input type="number" placeholder="year" disabled = true></td>
+        <td><input type="number" placeholder="copies" disabled = true></td>
+        <td><input type="submit" id="update" value="Update"></td>
+        <td> <input type="submit" id="delete" value="Delete"></td>
+      </tr>
+    </tbody>
+  </table>
+  <br>
 
     <script src="js/postScript.js"></script>
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>

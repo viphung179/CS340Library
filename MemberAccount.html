@@ -48,23 +48,46 @@
       <button type="submit" class="btn btn-dark" id="submit">Submit</button>
     </form>
         <br>
-    <h4 class='lead' >Current and Past Loans</h4>
-    <form>
-      <input type="text" placeholder="Title" disabled = true>
-      <input type="text" placeholder="Author" disabled = true>
-      <input type="date" placeholder="date" disabled = true>
-      <input type="text" placeholder="Current/Past" disabled = true>
-      <input type="submit" id="update" value="Update">
-    </form>
+    <h4 class='lead' >Current and Past Loans(to return book, change status to inactive)</h4>
+    <table>
+      <thead>
+        <th>Title</th>
+        <th>Author</th>
+        <th>Loan Date</th>
+        <th>Due Date</th>
+        <th>Status</th>
+      </thead>
+      <tbody>
+        <tr>
+          <td><input type="text" placeholder="Title" disabled = true></td>
+          <td><input type="text" placeholder="Author" disabled = true></td>
+          <td><input type="date" disabled = true></td>
+          <td><input type="date" disabled = true></td>
+          <td><input type="text" placeholder="Active/Inactive" disabled = true></td>
+          <td><input type="submit" id="update" value="Update"></td>
+        </tr>
+      </tbody>
+    </table>
     <br>
-    <h4 class='lead' >Current and Past Reservations</h4>
-    <form>
-      <input type="text" placeholder="Title" disabled = true>
-      <input type="text" placeholder="Author" disabled = true>
-      <input type="date" placeholder="date" disabled = true>
-      <input type="text" placeholder="Current/Past" disabled = true>
-      <input type="submit" id="update" value="Update">
-    </form>
+    <br>
+    <h4 class='lead' >Current and Past Reservations(to cancel reservation, change status to inactive)</h4>
+    <table>
+      <thead>
+        <th>Title</th>
+        <th>Author</th>
+        <th>Reservation Date</th>
+        <th>Status</th>
+      </thead>
+      <tbody>
+        <tr>
+          <td><input type="text" placeholder="Title" disabled = true></td>
+          <td><input type="text" placeholder="Author" disabled = true></td>
+          <td><input type="date" disabled = true></td>
+          <td><input type="text" placeholder="Active/Inactive" disabled = true></td>
+          <td><input type="submit" id="update" value="Update"></td>
+        </tr>
+      </tbody>
+    </table>
 
     <script src="js/postScript.js"></script>
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
