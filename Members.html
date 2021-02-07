@@ -58,36 +58,79 @@
           </form>
         </div>
       </div>
+
+      <div class='col-6'>
+        <div class="card shadow text-dark">
+          <form>
+            <h4 class='card-header'><b>Member Search</b></h4>
+            <div class=card-body>
+              <div class="form-group">
+                  <label for="fname">First Name</label>
+                  <input type="text" class="form-control" id="fname" placeholder="">
+              </div>
+
+              <div class="form-group">
+                  <label for="mname">Middle Name</label>
+                  <input type="text" class="form-control" id="mname" placeholder="">
+              </div>
+              <div class="form-group">
+                  <label for="lname">Last Name</label>
+                  <input type="text" class="form-control" id="lname" placeholder="">
+              </div>
+
+              <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" class="form-control" id="email" placeholder="">
+              </div>
+
+              <div class="form-group">
+                  <label for="name">Zip Code</label>
+                  <input type="text" class="form-control" id="zip" placeholder="">
+              </div>
+              <button type="submit" class="btn btn-info" id="submit">Search</button>
+          </div>
+        </form>
+        </div>
+      </div>
     </div>
-    <div class="pt-5">
-      <div class="card text-dark">
-        <h4 class='card-header bg-secondary text-white'>View/Update Members</h4>
-        <div class=card-body> 
-          <table>
-            <thead>
+  </section>
+
+  <div class="pt-5"> 
+    <div class="card text-dark">
+      <h4 class='card-header bg-secondary text-white text-center' >View/Update Members</h4>
+      <div class='card-body'> 
+        <table class = 'container'>
+          <thead>
+            <tr>
               <th>First Name</th>
               <th>Middle Name</th>
               <th>Last Name</th>
               <th>Email</th>
               <th>Zip Code</th>
-            </thead>
-            <tbody>
-              <tr>
-                <td><input type="text" placeholder="John" disabled = true></td>
-                <td><input type="text" placeholder="Smith" disabled = true></td>
-                <td><input type="text" placeholder="A" disabled = true></td>
-                <td><input type="email" placeholder="johnsmith@gmail.com" disabled = true></td>
-                <td><input type="text" placeholder="12345" disabled = true></td>
-                <td><input type="submit" id="update" value="Update"></td>
-                <td> <input type="submit" id="delete" value="Delete"></td>
-                <td><a href="MemberAccount.html" class="btn btn-primary btn-sm">View Loans/Reservations</a></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+              <th>Books Checked Out</th>
+              <th></th>
+              <th></th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><input type="text" placeholder="John" disabled = true></td>
+              <td><input type="text" placeholder="A" disabled = true></td>
+              <td><input type="text" placeholder="Smith" disabled = true></td>
+              <td><input type="email" placeholder="johnsmith@gmail.com" disabled = true></td>
+              <td><input type="text" placeholder="12345" disabled = true></td>
+              <td><input type="number" placeholder="4" disabled = true></td>
+              <td><input type="submit" id="update" value="Update"></td>
+              <td> <input type="submit" id="delete" value="Delete"></td>
+              
+              <td><a href="MemberAccount.html" class="btn btn-primary btn-sm">View Loans/Reservations</a></td>
+            </tr>
+          </tbody>
+        </table>              
       </div>
     </div>
-  </section>
+  </div>
 
     <script src="js/postScript.js"></script>
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
