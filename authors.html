@@ -28,7 +28,7 @@
       <div class='col-6'>
       <div class="card shadow text-dark">
       <form>
-          <h4 class='card-header'>Add Authors (* is required)</h4>
+          <h4 class='card-header'><b> Authors</b> (* is required)</h4>
           <div class=card-body>
             <div class="form-group">
                 <label for="name">First Name*</label>
@@ -48,11 +48,10 @@
       </form>
       </div>
     </div>
-  
     <br>
     <form class='col-6'>
       <div class="card shadow text-dark">
-        <h4 class='card-header '>Search for an Author</h4>
+        <h4 class='card-header '><b>Search for an Author</b></h4>
         <div class=card-body> 
           <div class="form-group">
             <label for="fname">First Name</label>
@@ -68,7 +67,7 @@
             <label for="lname">Last Name</label>
             <input type="text" class="form-control" id="lname" placeholder="">
           </div>
-          <button type="submit" class="btn btn-primary" id="submit"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+          <button type="submit" class="btn btn-info" id="submit"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
             <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
           </svg> Search</button>
       </div>
@@ -91,8 +90,8 @@
               <td><input type="text" placeholder="Nicholas" disabled = true></td>
               <td><input type="text" placeholder="" disabled = true></td>
               <td><input type="text" placeholder="Sparks" disabled = true></td>
-              <td><input type="submit" id="update" value="Update" ></td>
-              <td> <input type="submit" id="delete" value="Delete" ></td>
+              <td><input type="submit" id="update" value="Update" class="btn btn-info"></td>
+              <td> <input type="submit" id="delete" value="Delete" class="btn btn-info"></td>
             </tr>
           </tbody>
         </table>

@@ -84,7 +84,7 @@
               <label for="name">Year</label>
               <input type="number" class="form-control" id="year" placeholder="">
             </div>
-            <button type="submit" class="btn btn-primary" id="submit"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+            <button type="submit" class="btn btn-info" id="submit"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
               <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
             </svg> Search</button>
           </div>
@@ -93,40 +93,41 @@
       </div>
     </div>
     <br>
-    <div class="pt-5"> 
-      <div class="card text-dark">
-        <h4 class='card-header bg-secondary text-white' >Search Results</h4>
-        <div class='card-body'> 
-          <table>
-            <thead>
-              <th>Title</th>
-              <th>ISBN</th>
-              <th>Author</th>
-              <th>Year</th>
-              <th>Copies Available</th>
-            </thead>
-            <tbody>
-              <tr>
-                <td><input type="text" placeholder="The Notebook" disabled = true></td>
-                <td><input type="text" placeholder="553816713" disabled = true></td>
-                <td><input type="text" placeholder="1" disabled = true></td>
-                <td><input type="number" placeholder="2004" disabled = true></td>
-                <td><input type="number" placeholder="10" disabled = true></td>
-                <td><input type="submit" id="update" value="Update"></td>
-                <td> <input type="submit" id="delete" value="Delete"></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+  </section>
+
+  <div class="pt-5"> 
+    <div class="card text-dark">
+      <h4 class='card-header bg-secondary text-white text-center' >Search Results</h4>
+      <div class='card-body'> 
+        <table class = 'container'>
+          <thead>
+            <th>Title</th>
+            <th>ISBN</th>
+            <th>Author</th>
+            <th>Year</th>
+            <th>Copies Available</th>
+          </thead>
+          <tbody>
+            <tr>
+              <td><input type="text" placeholder="The Notebook" disabled = true></td>
+              <td><input type="text" placeholder="553816713" disabled = true></td>
+              <td><input type="text" placeholder="1" disabled = true></td>
+              <td><input type="number" placeholder="2004" disabled = true></td>
+              <td><input type="number" placeholder="10" disabled = true></td>
+              <td><input type="submit" id="update" value="Update" class="btn btn-info"></td>
+              <td> <input type="submit" id="delete" value="Delete" class="btn btn-info"></td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
- </section>
+  </div>
   <br>
 
-    <script src="js/postScript.js"></script>
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script> 
+  <script src="js/postScript.js"></script>
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script> 
 </body>
 
 </html>
