@@ -2,37 +2,59 @@ const baseUrl = `http://flip3.engr.oregonstate.edu:5149/members`;
 
 document.addEventListener('DOMContentLoaded', getdata);
 
-// document.getElementById('submit').addEventListener('click', function(event){
-//     let req = new XMLHttpRequest();
-//     let info = {name: null, reps: null, weight: null, unit: null, date: null};
-//     info.name = document.getElementById('name').value;
-//     info.reps = document.getElementById('reps').value;
-//     info.weight = document.getElementById('weight').value;
-//     if( document.getElementById('kg').checked){
-//         info.unit = 1
-//     } else if ( document.getElementById('lbs').checked){
-//         info.unit = 0
-//     }
-//     info.date = document.getElementById('date').value;
-//     req.open('POST', baseUrl, true);
-//     req.setRequestHeader('Content-Type', 'application/json');
-//     req.addEventListener('load',function(){
-//       if(req.status >= 200 && req.status < 400){
-//         let response = JSON.parse(req.responseText);
-//         deleteTable()
-//         if (response["rows"].length != 0){
-//           makeTable(response["rows"])
-//         }
-//       } else {
-//         console.log("Error in network request: " + req.statusText);
-//       }});
+document.getElementById('signup').addEventListener('click', function(event){
+    let req = new XMLHttpRequest();
+    let info = {mem_first_name: null, mem_mid_name: null, mem_last_name: null, mem_email: null, mem_zip_code: null, books_checked_out:null};
+    info.mem_first_name = document.getElementById('fname').value;
+    info.mem_mid_name = document.getElementById('mname').value;
+    info.mem_last_name = document.getElementById('lname').value;
+    info.mem_email = document.getElementById('email').value;
+    info.mem_zip_code = document.getElementById('zip').value;
+    info.books_checked_out = 0;
+    // if( document.getElementById('kg').checked){
+    //     info.unit = 1
+    // } else if ( document.getElementById('lbs').checked){
+    //     info.unit = 0
+    // }
+    // info.date = document.getElementById('date').value;
+    req.open('POST', baseUrl, true);
+    req.setRequestHeader('Content-Type', 'application/json');
+    req.addEventListener('load',function(){
+      if(req.status >= 200 && req.status < 400){
+        let response = JSON.parse(req.responseText);
+        deleteTable()
+        if (response["rows"].length != 0){
+          makeTable(response["rows"])
+        }
+      } else {
+        console.log("Error in network request: " + req.statusText);
+      }});
     
-//     if(info.name !== "" && info.reps !== "" && info.weight !== "" && info.unit !== "" && info.date !== "") {
-//         req.send(JSON.stringify(info));
-//     }
+     if(info.mem_first_name !== "" && info.mem_last_name !== "" && info.mem_email !== "" && info.mem_zip_code !== "" ) {
+        req.send(JSON.stringify(info));
+     }
 
-//     event.preventDefault();
-//   });
+    event.preventDefault();
+  });
+
+document.getElementById('search').addEventListener('click', getSearchResults);
+
+function getSearchResults() {
+  let req = new XMLHttpRequest();
+  req.open('GET', baseUrl, true);
+  req.addEventListener('load',function(){
+      if (req.status >= 200 && req.status < 400){
+        let response = JSON.parse(req.responseText);
+        if (response["rows"].length != 0){
+          makeTable(response["rows"]);
+          // console.log(response["rows"]);
+        }
+      } else {
+        console.log('Error in network request: ' + req.statusText);
+      }
+  })
+  req.send(null);
+}
 
 function getdata() {
   let req = new XMLHttpRequest();
@@ -54,7 +76,7 @@ function getdata() {
 function makeTable(rows) {
   let newTable = document.createElement("table");
   newTable.id = 'table';
-  newTable.class = 'container'
+  newTable.classList.add('container', 'mb-5');
   document.body.appendChild(newTable);
 
   makeHeaders(newTable);
@@ -67,8 +89,10 @@ function makeTable(rows) {
     if (target.tagName != 'BUTTON') return;
     if (target.textContent == "Delete"){
       deleteRow(targetId);
-    } else {
+    } else if (target.textContent == "Update") {
       updateRow(target, targetId);
+    } else {
+      console.log('view')
     }
   })
 }
@@ -105,14 +129,23 @@ function makeRow(rows, newTable){
     // newRow.appendChild(createTD("date", rows[i].date.slice(0,10), "newDate"+ rows[i].id));
     let updateCell = document.createElement("td");
     let deleteCell = document.createElement("td");
+    let viewCell = document.createElement("td");
     let updateButton = document.createElement("button");
     let deleteButton = document.createElement("button");
+    let viewButton = document.createElement("a");
     updateButton.textContent = "Update";
     deleteButton.textContent = "Delete";
+    viewButton.textContent = "View Loans/Reservations";
+    viewButton.href = "MemberAccount.html"
+    updateButton.classList.add("btn","btn-info");
+    deleteButton.classList.add("btn","btn-info");
+    viewButton.classList.add("btn","btn-info");
     updateCell.appendChild(updateButton);
     deleteCell.appendChild(deleteButton);
+    viewCell.appendChild(viewButton);
     newRow.appendChild(updateCell);
     newRow.appendChild(deleteCell);
+    newRow.appendChild(viewCell)
     body.appendChild(newRow);
   }
 }
@@ -205,31 +238,31 @@ function createTD(type, value, id, isID = false) {
   }
 }
 
-function radioInputs(value,id) {
-  let radios = document.createElement("span");
-  let kgRadio = document.createElement("INPUT");
-  let kgText = document.createTextNode("Kg");
-  kgRadio.name = id;
-  kgRadio.type = "radio";
-  kgRadio.id = "newKg" + id;
-  let lbsRadio = document.createElement("INPUT");
-  let lbsText = document.createTextNode("Lbs");
-  lbsRadio.name = id;
-  lbsRadio.type = "radio";
-  lbsRadio.id = "newLbs" + id;
-  if (value === 0) {
-    lbsRadio.checked = true;
-  } else {
-    kgRadio.checked = true;
-  }
-  kgRadio.disabled = true;
-  lbsRadio.disabled = true;
-  radios.appendChild(kgRadio);
-  radios.appendChild(kgText);
-  radios.appendChild(lbsRadio);
-  radios.appendChild(lbsText);
-  return radios
-}
+// function radioInputs(value,id) {
+//   let radios = document.createElement("span");
+//   let kgRadio = document.createElement("INPUT");
+//   let kgText = document.createTextNode("Kg");
+//   kgRadio.name = id;
+//   kgRadio.type = "radio";
+//   kgRadio.id = "newKg" + id;
+//   let lbsRadio = document.createElement("INPUT");
+//   let lbsText = document.createTextNode("Lbs");
+//   lbsRadio.name = id;
+//   lbsRadio.type = "radio";
+//   lbsRadio.id = "newLbs" + id;
+//   if (value === 0) {
+//     lbsRadio.checked = true;
+//   } else {
+//     kgRadio.checked = true;
+//   }
+//   kgRadio.disabled = true;
+//   lbsRadio.disabled = true;
+//   radios.appendChild(kgRadio);
+//   radios.appendChild(kgText);
+//   radios.appendChild(lbsRadio);
+//   radios.appendChild(lbsText);
+//   return radios
+// }
 
 function deleteTable(){
   let table = document.querySelector("table");
