@@ -33,9 +33,25 @@ const getAllData = (res) => {
   })
 }
 
+const getSearchResults = (req, res) => {
+  mysql.pool.query('SELECT * FROM members WHERE mem_last_name =?', req.query.last, (err, rows, fields) => {
+    if (err) {
+      next(err);
+      return;
+    }
+    res.json({'rows': rows });
+  })
+}
+
 // Get members
 app.get('/members',function(req,res,next){
-  getAllData(res);
+    if (req.query.last === "Smith") {
+      console.log(req.query)
+      getSearchResults(req,res);
+    } else {
+      console.log(req.query)
+      getAllData(res);
+    }
   });
 
 // insert members
