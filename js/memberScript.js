@@ -37,14 +37,13 @@ document.getElementById('signup').addEventListener('click', function(event){
     event.preventDefault();
   });
 
-document.getElementById('search').addEventListener('click', getSearchResults);
-
-function getSearchResults() {
-  let req = new XMLHttpRequest();
-  req.open('GET', baseUrl, true);
-  req.addEventListener('load',function(){
+  document.getElementById('search').addEventListener('click', function(event){
+    let req = new XMLHttpRequest();
+    req.open('GET', baseUrl + "?last=Smith", true);
+    req.addEventListener('load',function(){
       if (req.status >= 200 && req.status < 400){
         let response = JSON.parse(req.responseText);
+        deleteTable()
         if (response["rows"].length != 0){
           makeTable(response["rows"]);
           // console.log(response["rows"]);
@@ -52,9 +51,12 @@ function getSearchResults() {
       } else {
         console.log('Error in network request: ' + req.statusText);
       }
-  })
-  req.send(null);
-}
+    })
+    req.send(null);
+
+    event.preventDefault();
+  });
+
 
 function getdata() {
   let req = new XMLHttpRequest();
