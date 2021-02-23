@@ -91,13 +91,15 @@ function makeTable(rows) {
     let target = event.target;
     let targetId = target.parentNode.parentNode.firstElementChild.textContent;
     if (target.tagName != 'BUTTON') return;
-    // if (target.textContent == "Delete"){
-    //   deleteRow(targetId);
-    // } else if (target.textContent == "Update") {
-    //   updateRow(target, targetId);
-    // } else {
-    //   console.log('view')
-    // }
+    if (target.textContent == "Delete"){
+      deleteRow(targetId);
+    } else if (target.textContent == "Update") {
+      updateRow(target, targetId);
+    } else {
+      localStorage.setItem('objectToPass', targetId);
+      console.log(localStorage['objectToPass']);
+      window.location.href = 'MemberAccount.html'
+    }
   })
 }
 
@@ -136,11 +138,11 @@ function makeRow(rows, newTable){
     let viewCell = document.createElement("td");
     let updateButton = document.createElement("button");
     let deleteButton = document.createElement("button");
-    let viewButton = document.createElement("a");
+    let viewButton = document.createElement("button");
     updateButton.textContent = "Update";
     deleteButton.textContent = "Delete";
     viewButton.textContent = "View Loans/Reservations";
-    viewButton.href = "MemberAccount.html"
+    // viewButton.href = "MemberAccount.html"
     updateButton.classList.add("btn","btn-info");
     deleteButton.classList.add("btn","btn-info");
     viewButton.classList.add("btn","btn-info");
