@@ -39,7 +39,9 @@ document.getElementById('signup').addEventListener('click', function(event){
 
   document.getElementById('search').addEventListener('click', function(event){
     let req = new XMLHttpRequest();
-    req.open('GET', baseUrl + "?last=Smith", true);
+    let nameSearch = document.getElementById('nameSearch').value;
+    let zipSearch = document.getElementById('zipSearch').value;
+    req.open('GET', baseUrl + "?nameSearch=" + nameSearch +  "&zipSearch=" + zipSearch, true);
     req.addEventListener('load',function(){
       if (req.status >= 200 && req.status < 400){
         let response = JSON.parse(req.responseText);
@@ -89,13 +91,13 @@ function makeTable(rows) {
     let target = event.target;
     let targetId = target.parentNode.parentNode.firstElementChild.textContent;
     if (target.tagName != 'BUTTON') return;
-    if (target.textContent == "Delete"){
-      deleteRow(targetId);
-    } else if (target.textContent == "Update") {
-      updateRow(target, targetId);
-    } else {
-      console.log('view')
-    }
+    // if (target.textContent == "Delete"){
+    //   deleteRow(targetId);
+    // } else if (target.textContent == "Update") {
+    //   updateRow(target, targetId);
+    // } else {
+    //   console.log('view')
+    // }
   })
 }
 
