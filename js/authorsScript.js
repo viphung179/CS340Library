@@ -234,12 +234,10 @@ function getData(){
     let author_last_name = document.getElementById('last_name').value;
     if (first_name && author_last_name){
         req.open('GET', baseUrl + '?first_name=' + first_name + '&author_last_name=' + author_last_name , true);
-        console.log("All fields selected!!!")
     } else if (author_id){
         req.open('GET', baseUrl + '?auth_id=' + author_id, true);
     } else if (first_name) {
         req.open('GET', baseUrl + '?first_name=' + first_name, true);
-        console.log("ISBN selected!!!")
     } else if (author_last_name){
         req.open('GET', baseUrl + '?author_last_name=' + author_last_name, true);
     } else {

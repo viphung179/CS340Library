@@ -234,14 +234,18 @@ function getData(){
     let year = document.getElementById('sYear').value;
     if (title && isbn && auth_last_name && year){
         req.open('GET', baseUrl + '?title=' + title + '&isbn=' + isbn + '&last_name=' + auth_last_name +'&year=' + year, true);
-        console.log("All fields selected!!!")
+    } else if (title && auth_last_name && year){
+        req.open('GET', baseUrl + '?title=' + title + '&last_name=' + auth_last_name + '&year=' + year, true);
     } else if (title && auth_last_name){
         req.open('GET', baseUrl + '?title=' + title + '&last_name=' + auth_last_name, true);
-    } else if (title){
+    }else if (title && year){
+        req.open('GET', baseUrl + '?title=' + title + '&year=' + year, true);
+    }else if (auth_last_name && year){
+        req.open('GET', baseUrl + '?last_name=' + auth_last_name + '&year=' + year, true);
+    }else if (title){
         req.open('GET', baseUrl + '?title=' + title, true);
     } else if (isbn) {
         req.open('GET', baseUrl + '?isbn=' + isbn, true);
-        console.log("ISBN selected!!!")
     } else if (auth_last_name){
         req.open('GET', baseUrl + '?last_name=' + auth_last_name, true);
     } else if (year){
