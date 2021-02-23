@@ -42,7 +42,7 @@
 
             <div class="form-group">
               <label for="auth_id">Author ID*</label>
-              <input type="text" class="form-control" id="auth_id" placeholder="">
+              <input type="number" class="form-control" id="auth_id" placeholder="">
             </div>
 
             <div class="form-group">
@@ -54,7 +54,7 @@
               <label for="copies">Copies Available*</label>
               <input type="number" class="form-control" id="copies" placeholder="">
             </div>
-            <button type="submit" class="btn btn-info" id="submit">Add Book</button>
+            <button type="submit" class="btn btn-info" id="addBook">Add Book</button>
           </div>
         </form>
       </div>
@@ -67,27 +67,27 @@
           <div class=card-body>
             <div class="form-group">
               <label for="name">Title</label>
-              <input type="text" class="form-control" id="title" placeholder="">
+              <input type="text" class="form-control" id="sTitle" placeholder="">
             </div>
 
             <div class="form-group">
               <label for="name">ISBN</label>
-              <input type="text" class="form-control" id="isbn" placeholder="">
+              <input type="text" class="form-control" id="sIsbn" placeholder="">
             </div>
 
             <div class="form-group">
               <label for="name">Author Last Name</label>
-              <input type="text" class="form-control" id="auth_id" placeholder="">
+              <input type="text" class="form-control" id="auth_last_name" placeholder="">
             </div>
 
             <div class="form-group">
               <label for="name">Year</label>
-              <input type="number" class="form-control" id="year" placeholder="">
+              <input type="number" class="form-control" id="sYear" placeholder="">
             </div>
-            <button type="submit" class="btn btn-info" id="submit"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+            <button type="submit" class="btn btn-info" id="searchBook"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
               <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
             </svg> Search</button>
-            <p class= 'card-text'>leave fields blank to see all books</p>
+            <p class= 'card-text text-secondary'>leave fields blank to see all books</p>
           </div>
         </form>
       </div>
@@ -97,9 +97,9 @@
   </section>
 
   <div class="pt-5"> 
-    <div class="card text-dark">
+    <!-- <div class="card text-dark"> -->
       <h4 class='card-header bg-secondary text-white text-center' >Search Results</h4>
-      <div class='card-body'> 
+      <!-- <div class='card-body'> 
         <table class = 'container'>
           <thead>
             <th>Title</th>
@@ -122,10 +122,10 @@
         </table>
       </div>
     </div>
-  </div>
+  </div> -->
   <br>
-
-  <script src="js/postScript.js"></script>
+  <table id="workoutsTable" ></table>
+  <script src="js/bookScript.js"></script>
   <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script> 
