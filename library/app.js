@@ -23,7 +23,7 @@ const dropTable = "DROP TABLE IF EXISTS workout";
 
 // Unit of 0 is lbs, unit of 1 is kgs
 
-const getAllData = (res) => {
+const getMemAllData = (res) => {
   mysql.pool.query(getAllMembers, (err, rows, fields) => {
     if (err) {
       next(err);
@@ -33,24 +33,45 @@ const getAllData = (res) => {
   })
 }
 
-const getSearchResults = (req, res) => {
-  mysql.pool.query('SELECT * FROM members WHERE mem_last_name =?', req.query.last, (err, rows, fields) => {
-    if (err) {
-      next(err);
-      return;
-    }
-    res.json({'rows': rows });
-  })
+const getMemSearchResults = (req, res) => {
+  if (req.query.nameSearch !== "" && req.query.zipSearch !== "") {
+    mysql.pool.query('SELECT * FROM members WHERE mem_last_name = ? AND mem_zip_code = ?', [req.query.nameSearch,req.query.zipSearch], (err, rows, fields) => {
+      if (err) {
+        next(err);
+        return;
+      }
+      res.json({'rows': rows });
+    })
+  } else if (req.query.nameSearch !== "") {
+    mysql.pool.query('SELECT * FROM members WHERE mem_last_name =?', req.query.nameSearch, (err, rows, fields) => {
+      if (err) {
+        next(err);
+        return;
+      }
+      res.json({'rows': rows });
+    })
+  } else if (req.query.zipSearch !== "") {
+    mysql.pool.query('SELECT * FROM members WHERE mem_zip_code =?', req.query.zipSearch, (err, rows, fields) => {
+      if (err) {
+        next(err);
+        return;
+      }
+      res.json({'rows': rows });
+    })
+  } else {
+    getMemAllData(res);
+  }
+ 
 }
 
 // Get members
 app.get('/members',function(req,res,next){
-    if (req.query.last === "Smith") {
-      console.log(req.query)
-      getSearchResults(req,res);
+    if (Object.keys(req.query).length !== 0) {
+      // console.log(req.query)
+      getMemSearchResults(req,res);
     } else {
-      console.log(req.query)
-      getAllData(res);
+      // console.log(req.query)
+      getMemAllData(res);
     }
   });
 
@@ -62,7 +83,7 @@ app.post('/members',function(req,res,next){
       next(err);
       return;
     }
-    getAllData(res);
+    getMemAllData(res);
   });
 });
 
@@ -73,13 +94,13 @@ app.delete('/',function(req,res,next){
       next(err);
       return;
     }
-    getAllData(res);
+    getMemAllData(res);
   });
 });
 
 
 ///simple-update
-app.put('/',function(req,res,next){
+app.put('/members',function(req,res,next){
   var { name, reps, weight, unit, date, id } = req.body;
   mysql.pool.query(updateQuery,
     [name, reps, weight, unit, date, id],
@@ -88,7 +109,7 @@ app.put('/',function(req,res,next){
       next(err);
       return;
     }
-    getAllData(res);
+    getMemAllData(res);
   });
 });
 
