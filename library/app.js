@@ -10,9 +10,16 @@ app.use(CORS());
 
 const getAllMembers = 'SELECT * FROM members' ;
 const insertQuery = "INSERT INTO members (`mem_first_name`, `mem_mid_name`, `mem_last_name`, `mem_email`, `mem_zip_code`, `books_checked_out`) VALUES (?, ?, ?, ?, ?,?)";
-const updateQuery = "UPDATE workout SET name=?, reps=?, weight=?, unit=?, date=? WHERE id=? " ;
-const deleteQuery = "DELETE FROM workout WHERE id=?";
-const dropTable = "DROP TABLE IF EXISTS workout";
+const getAllLoans =   `SELECT title, auth_first_name, auth_last_name, loans.loan_id, loan_date, loan_due_date 
+                      FROM members 
+                      JOIN loans ON members.mem_id = loans.mem_id
+                      JOIN book_loan ON loans.loan_id = book_loan.loan_id
+                      JOIN books ON book_loan.book_id = books.book_id
+                      JOIN authors ON books.auth_id = authors.auth_id
+                      AND members.mem_id = ?;`
+// const updateQuery = "UPDATE workout SET name=?, reps=?, weight=?, unit=?, date=? WHERE id=? " ;
+// const deleteQuery = "DELETE FROM workout WHERE id=?";
+// const dropTable = "DROP TABLE IF EXISTS workout";
 // const makeTableQuery = `CREATE TABLE workout(
 //                         id INT PRIMARY KEY AUTO_INCREMENT,
 //                         name VARCHAR(255) NOT NULL,
@@ -99,7 +106,7 @@ app.delete('/',function(req,res,next){
 });
 
 
-///simple-update
+///member-update
 app.put('/members',function(req,res,next){
   var { name, reps, weight, unit, date, id } = req.body;
   mysql.pool.query(updateQuery,
@@ -111,6 +118,20 @@ app.put('/members',function(req,res,next){
     }
     getMemAllData(res);
   });
+});
+
+// Get members Loan
+const getMemLoans = (req, res) => {
+  mysql.pool.query(getAllLoans, req.query.mem_id, (err, rows, fields) => {
+    if (err) {
+      next(err);
+      return;
+    }
+    res.json({'rows': rows });
+  })
+}
+app.get('/memberAccount',function(req,res,next){
+  getMemLoans(req,res);
 });
 
 
