@@ -52,27 +52,35 @@ document.getElementById('loanBook').addEventListener('click', function(event){
     event.preventDefault();
   });
 
-//   document.getElementById('search').addEventListener('click', function(event){
-//     let req = new XMLHttpRequest();
-//     let nameSearch = document.getElementById('nameSearch').value;
-//     let zipSearch = document.getElementById('zipSearch').value;
-//     req.open('GET', baseUrl + "?nameSearch=" + nameSearch +  "&zipSearch=" + zipSearch, true);
-//     req.addEventListener('load',function(){
-//       if (req.status >= 200 && req.status < 400){
-//         let response = JSON.parse(req.responseText);
-//         deleteTable()
-//         if (response["rows"].length != 0){
-//           makeTable(response["rows"]);
-//           // console.log(response["rows"]);
-//         }
-//       } else {
-//         console.log('Error in network request: ' + req.statusText);
-//       }
-//     })
-//     req.send(null);
+document.getElementById('resBook').addEventListener('click', function(event){
+    let req = new XMLHttpRequest();
+    let info = {book_id: null, mem_id: currMemId};
+    info.book_id = document.getElementById('resBookID').value;
+    req.open('POST', baseUrl + "res", true);
+    req.setRequestHeader('Content-Type', 'application/json');
+    req.addEventListener('load',function(){
+      if(req.status >= 200 && req.status < 400){
+        let response = JSON.parse(req.responseText);
+        deleteTable()
+        if (response["loans"].length != 0){
+          makeLoansTable(response["loans"]);
+        }
 
-//     event.preventDefault();
-//   });
+        if (response["reserv"].length != 0){
+          makeResTable(response["reserv"]);
+        }
+      } else {
+        console.log("Error in network request: " + req.statusText);
+      }});
+    
+     if(info.book_id !== "" ) {
+        req.send(JSON.stringify(info));
+     }
+
+    event.preventDefault();
+});
+
+
 
 
 function getdata() {
@@ -98,11 +106,12 @@ function getdata() {
 
 function makeLoansTable(rows) {
   let newTable = document.createElement("table");
-  newTable.id = 'table';
+  newTable.id = 'loanTable';
   newTable.classList.add('container', 'mb-5');
   let newCardHeader = document.createElement("h5");
-  newCardHeader.textContent = "Current and Past Loans (to return book, change status to inactive)";
+  newCardHeader.textContent = "Current and Past Loans";
   newCardHeader.classList.add('card-header', 'alert-info', 'text-center', 'mb-1');
+  newCardHeader.id = 'loanHeader'
   document.body.appendChild(newCardHeader);
   document.body.appendChild(newTable);
 
@@ -167,11 +176,12 @@ function makeLoanRow(rows, newTable){
 
 function makeResTable(rows) {
   let newTable = document.createElement("table");
-  newTable.id = 'table';
+  newTable.id = 'resTable';
   newTable.classList.add('container', 'mb-5');
   let newCardHeader = document.createElement("h5");
-  newCardHeader.textContent = "Current and Past Reservations (to cancel reservation, change status to inactive)";
+  newCardHeader.textContent = "Current and Past Reservations";
   newCardHeader.classList.add('card-header', 'alert-dark', 'text-center', 'mb-1');
+  newCardHeader.id = 'resHeader'
   document.body.appendChild(newCardHeader);
   document.body.appendChild(newTable);
 
@@ -362,10 +372,17 @@ function createTD(type, value, id, isID = false) {
 // }
 
 function deleteTable(){
-  let table = document.querySelector("table");
-  let headings = document.querySelector("h5");
-  if (table !== null) {
-    headings.parentNode.removeChild(headings)
-    table.parentNode.removeChild(table)
+  let loantable = document.getElementById('loanTable');
+  let loanheading = document.getElementById('loanHeader');
+  let restable = document.getElementById('resTable');
+  let resheading = document.getElementById('resHeader');
+  if (loantable !== null) {
+    loantable.parentNode.removeChild(loantable);
+    loanheading.parentNode.removeChild(loanheading);
+  }
+
+  if (restable !== null) {
+    restable.parentNode.removeChild(restable);
+    resheading.parentNode.removeChild(resheading);
   }
 }
