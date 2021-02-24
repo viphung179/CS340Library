@@ -1,44 +1,56 @@
-const baseUrl = `http://flip3.engr.oregonstate.edu:5149/memberAccount`;
-console.log(localStorage['objectToPass']);
-let currMemId = localStorage['objectToPass'];
+const baseUrl = `http://flip3.engr.oregonstate.edu:5249/memberAccount`;
+// console.log(localStorage['mem_id']);
+// console.log(localStorage['mem_fname']);
+let currMemId = localStorage['mem_id'];
+let currMemName = localStorage['mem_fname'] + ' ' + localStorage['mem_lname'];
+let currBooks = localStorage['books_checked']
+// console.log(currMemName)
 // localStorage.removeItem('objectToPass')
+
+let userID = document.createElement('h4');
+userID.textContent = 'Member ID: ' + currMemId;
+userID.classList.add('lead', 'pl-3');
+document.body.appendChild(userID);
+
+let userName = document.createElement('h4');
+userName.textContent = 'Member Name: ' + currMemName;
+userName.classList.add('lead', 'pl-3');
+document.body.appendChild(userName);
+
+let userBooks = document.createElement('h4');
+userBooks.textContent = 'Books Checked Out: ' + currBooks;
+userBooks.classList.add('lead', 'pl-3');
+document.body.appendChild(userBooks);
 
 document.addEventListener('DOMContentLoaded', getdata);
 
-// document.getElementById('signup').addEventListener('click', function(event){
-//     let req = new XMLHttpRequest();
-//     let info = {mem_first_name: null, mem_mid_name: null, mem_last_name: null, mem_email: null, mem_zip_code: null, books_checked_out:null};
-//     info.mem_first_name = document.getElementById('fname').value;
-//     info.mem_mid_name = document.getElementById('mname').value;
-//     info.mem_last_name = document.getElementById('lname').value;
-//     info.mem_email = document.getElementById('email').value;
-//     info.mem_zip_code = document.getElementById('zip').value;
-//     info.books_checked_out = 0;
-//     // if( document.getElementById('kg').checked){
-//     //     info.unit = 1
-//     // } else if ( document.getElementById('lbs').checked){
-//     //     info.unit = 0
-//     // }
-//     // info.date = document.getElementById('date').value;
-//     req.open('POST', baseUrl, true);
-//     req.setRequestHeader('Content-Type', 'application/json');
-//     req.addEventListener('load',function(){
-//       if(req.status >= 200 && req.status < 400){
-//         let response = JSON.parse(req.responseText);
-//         deleteTable()
-//         if (response["rows"].length != 0){
-//           makeTable(response["rows"])
-//         }
-//       } else {
-//         console.log("Error in network request: " + req.statusText);
-//       }});
-    
-//      if(info.mem_first_name !== "" && info.mem_last_name !== "" && info.mem_email !== "" && info.mem_zip_code !== "" ) {
-//         req.send(JSON.stringify(info));
-//      }
+document.getElementById('loanBook').addEventListener('click', function(event){
+    let req = new XMLHttpRequest();
+    let info = {book_id: null, mem_id: currMemId};
+    info.book_id = document.getElementById('bookID').value;
+    req.open('POST', baseUrl, true);
+    req.setRequestHeader('Content-Type', 'application/json');
+    req.addEventListener('load',function(){
+      if(req.status >= 200 && req.status < 400){
+        let response = JSON.parse(req.responseText);
+        deleteTable()
+        if (response["loans"].length != 0){
+          makeLoansTable(response["loans"]);
+        }
 
-//     event.preventDefault();
-//   });
+        if (response["reserv"].length != 0){
+          makeResTable(response["reserv"]);
+        }
+      } else {
+        console.log("Error in network request: " + req.statusText);
+      }});
+    
+     if(info.mem_first_name !== "" && info.mem_last_name !== "" && info.mem_email !== "" && info.mem_zip_code !== "" ) {
+        req.send(JSON.stringify(info));
+     }
+
+    event.preventDefault();
+  });
 
 //   document.getElementById('search').addEventListener('click', function(event){
 //     let req = new XMLHttpRequest();
@@ -69,9 +81,13 @@ function getdata() {
   req.addEventListener('load',function(){
       if (req.status >= 200 && req.status < 400){
         let response = JSON.parse(req.responseText);
-        if (response["rows"].length != 0){
-          makeTable(response["rows"]);
-          console.log(response["rows"]);
+        // console.log(typeof response)
+        if (response["loans"].length != 0){
+          makeLoansTable(response["loans"]);
+        }
+
+        if (response["reserv"].length != 0){
+          makeResTable(response["reserv"]);
         }
       } else {
         console.log('Error in network request: ' + req.statusText);
@@ -80,19 +96,19 @@ function getdata() {
   req.send(null);
 }
 
-function makeTable(rows) {
+function makeLoansTable(rows) {
   let newTable = document.createElement("table");
   newTable.id = 'table';
   newTable.classList.add('container', 'mb-5');
   let newCardHeader = document.createElement("h5");
-  newCardHeader.textContent = "Current and Past loans";
+  newCardHeader.textContent = "Current and Past Loans (to return book, change status to inactive)";
   newCardHeader.classList.add('card-header', 'alert-info', 'text-center', 'mb-1');
   document.body.appendChild(newCardHeader);
   document.body.appendChild(newTable);
 
-  makeHeaders(newTable);
+  makeLoanHeaders(newTable);
 
-  makeRow(rows, newTable);
+  makeLoanRow(rows, newTable);
 
   newTable.addEventListener('click',function(event){
     let target = event.target;
@@ -108,7 +124,7 @@ function makeTable(rows) {
   })
 }
 
-function makeHeaders(newTable) {
+function makeLoanHeaders(newTable) {
   let header = document.createElement("thead");
   newTable.appendChild(header);
   let headerName = ['id','Title', 'Author', 'Loan Date', 'Due Date'];
@@ -124,7 +140,7 @@ function makeHeaders(newTable) {
     }
 }
 
-function makeRow(rows, newTable){
+function makeLoanRow(rows, newTable){
   let body = document.createElement("tbody");
   newTable.appendChild(body);
   for (let i = 0; i < rows.length; i++) {
@@ -139,6 +155,75 @@ function makeRow(rows, newTable){
     // newRow.appendChild(radioInputs(rows[i].unit,rows[i].id));
     newRow.appendChild(createTD("date", rows[i].loan_date.slice(0,10), "loanDate"+ rows[i].id));
     newRow.appendChild(createTD("date", rows[i].loan_due_date.slice(0,10), "dueDate"+ rows[i].id));
+    let updateCell = document.createElement("td");
+    let updateButton = document.createElement("button");
+    updateButton.textContent = "Update";
+    updateButton.classList.add("btn","btn-info");
+    updateCell.appendChild(updateButton);
+    newRow.appendChild(updateCell);
+    body.appendChild(newRow);
+  }
+}
+
+function makeResTable(rows) {
+  let newTable = document.createElement("table");
+  newTable.id = 'table';
+  newTable.classList.add('container', 'mb-5');
+  let newCardHeader = document.createElement("h5");
+  newCardHeader.textContent = "Current and Past Reservations (to cancel reservation, change status to inactive)";
+  newCardHeader.classList.add('card-header', 'alert-dark', 'text-center', 'mb-1');
+  document.body.appendChild(newCardHeader);
+  document.body.appendChild(newTable);
+
+  makeResHeaders(newTable);
+
+  makeResRow(rows, newTable);
+
+  newTable.addEventListener('click',function(event){
+    let target = event.target;
+    let targetId = target.parentNode.parentNode.firstElementChild.textContent;
+    if (target.tagName != 'BUTTON') return;
+    if (target.textContent == "Delete"){
+      deleteRow(targetId);
+    } else if (target.textContent == "Update") {
+      updateRow(target, targetId);
+    } else {
+      localStorage.setItem('objectToPass', targetId);
+    }
+  })
+}
+
+function makeResHeaders(newTable) {
+  let header = document.createElement("thead");
+  newTable.appendChild(header);
+  let headerName = ['id','Title', 'Author', 'Reservation Date', 'Status'];
+    for (let c = 0; c < headerName.length; c++){
+        let newHeader = document.createElement("th");
+        newHeader.textContent = headerName[c];
+
+        if (newHeader.textContent == "id") {
+          newHeader.style.display = "none";
+        }
+
+        header.appendChild(newHeader);
+    }
+}
+
+function makeResRow(rows, newTable){
+  let body = document.createElement("tbody");
+  newTable.appendChild(body);
+  for (let i = 0; i < rows.length; i++) {
+    let newRow = document.createElement("tr");
+    newRow.appendChild(createTD("number", rows[i].res_id, "resId" + rows[i].id, true));
+    newRow.appendChild(createTD("text", rows[i].title, "resTitle" + rows[i].id));
+    newRow.appendChild(createTD("text", rows[i].auth_first_name + " " + rows[i].auth_last_name, "resAuthName" + rows[i].id));
+    // newRow.appendChild(createTD("text", rows[i].mem_last_name, "lastName" + rows[i].id));
+    // newRow.appendChild(createTD("email", rows[i].mem_email, "email"+ rows[i].id));
+    // newRow.appendChild(createTD("text", rows[i].mem_zip_code, "zipCode"+ rows[i].id));
+    // newRow.appendChild(createTD("number", rows[i].books_checked_out, "books"+ rows[i].id));
+    // newRow.appendChild(radioInputs(rows[i].unit,rows[i].id));
+    newRow.appendChild(createTD("date", rows[i].res_date.slice(0,10), "resDate"+ rows[i].id));
+    newRow.appendChild(createTD("text", rows[i].res_active, "resStatus" + rows[i].id));
     let updateCell = document.createElement("td");
     // let deleteCell = document.createElement("td");
     // let viewCell = document.createElement("td");
@@ -276,9 +361,11 @@ function createTD(type, value, id, isID = false) {
 //   return radios
 // }
 
-// function deleteTable(){
-//   let table = document.querySelector("table");
-//   if (table !== null) {
-//     table.parentNode.removeChild(table)
-//   }
-// }
+function deleteTable(){
+  let table = document.querySelector("table");
+  let headings = document.querySelector("h5");
+  if (table !== null) {
+    headings.parentNode.removeChild(headings)
+    table.parentNode.removeChild(table)
+  }
+}

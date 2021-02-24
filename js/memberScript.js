@@ -1,4 +1,4 @@
-const baseUrl = `http://flip3.engr.oregonstate.edu:5149/members`;
+const baseUrl = `http://flip3.engr.oregonstate.edu:5249/members`;
 
 document.addEventListener('DOMContentLoaded', getdata);
 
@@ -24,7 +24,7 @@ document.getElementById('signup').addEventListener('click', function(event){
         let response = JSON.parse(req.responseText);
         deleteTable()
         if (response["rows"].length != 0){
-          makeTable(response["rows"])
+          makeLoansTable(response["rows"])
         }
       } else {
         console.log("Error in network request: " + req.statusText);
@@ -47,7 +47,7 @@ document.getElementById('signup').addEventListener('click', function(event){
         let response = JSON.parse(req.responseText);
         deleteTable()
         if (response["rows"].length != 0){
-          makeTable(response["rows"]);
+          makeLoansTable(response["rows"]);
           // console.log(response["rows"]);
         }
       } else {
@@ -67,7 +67,7 @@ function getdata() {
       if (req.status >= 200 && req.status < 400){
         let response = JSON.parse(req.responseText);
         if (response["rows"].length != 0){
-          makeTable(response["rows"]);
+          makeLoansTable(response["rows"]);
           // console.log(response["rows"]);
         }
       } else {
@@ -77,33 +77,42 @@ function getdata() {
   req.send(null);
 }
 
-function makeTable(rows) {
+function makeLoansTable(rows) {
   let newTable = document.createElement("table");
   newTable.id = 'table';
   newTable.classList.add('container', 'mb-5');
   document.body.appendChild(newTable);
 
-  makeHeaders(newTable);
+  makeLoanHeaders(newTable);
 
-  makeRow(rows, newTable);
+  makeLoanRow(rows, newTable);
 
   newTable.addEventListener('click',function(event){
     let target = event.target;
-    let targetId = target.parentNode.parentNode.firstElementChild.textContent;
+    let targetRow = target.parentNode.parentNode
+    let targetId = targetRow.firstElementChild.textContent;
+    let memFname = targetRow.firstElementChild.nextElementSibling;
+    let memLname = memFname.nextElementSibling.nextElementSibling;
+    let booksChecked = memLname.nextElementSibling.nextElementSibling.nextElementSibling;
+    console.log(memFname)
     if (target.tagName != 'BUTTON') return;
     if (target.textContent == "Delete"){
       deleteRow(targetId);
     } else if (target.textContent == "Update") {
       updateRow(target, targetId);
     } else {
-      localStorage.setItem('objectToPass', targetId);
-      console.log(localStorage['objectToPass']);
+      let member = {'mem_id': targetId, 'mem_fname': memFname}
+      localStorage.setItem('mem_id', targetId);
+      localStorage.setItem('mem_fname', memFname.textContent);
+      localStorage.setItem('mem_lname', memLname.textContent);
+      localStorage.setItem('books_checked', booksChecked.textContent);
+      // console.log(localStorage['objectToPass']);
       window.location.href = 'MemberAccount.html'
     }
   })
 }
 
-function makeHeaders(newTable) {
+function makeLoanHeaders(newTable) {
   let header = document.createElement("thead");
   newTable.appendChild(header);
   let headerName = ['id','First Name', 'Middle Name', 'Last Name', 'Email', 'Zip Code', 'Books Checked Out'];
@@ -119,18 +128,18 @@ function makeHeaders(newTable) {
     }
 }
 
-function makeRow(rows, newTable){
+function makeLoanRow(rows, newTable){
   let body = document.createElement("tbody");
   newTable.appendChild(body);
   for (let i = 0; i < rows.length; i++) {
     let newRow = document.createElement("tr");
-    newRow.appendChild(createTD("number", rows[i].mem_id, "id" + rows[i].id, true));
-    newRow.appendChild(createTD("text", rows[i].mem_first_name, "firstName" + rows[i].id));
-    newRow.appendChild(createTD("text", rows[i].mem_mid_name, "midName" + rows[i].id));
-    newRow.appendChild(createTD("text", rows[i].mem_last_name, "lastName" + rows[i].id));
-    newRow.appendChild(createTD("email", rows[i].mem_email, "email"+ rows[i].id));
-    newRow.appendChild(createTD("text", rows[i].mem_zip_code, "zipCode"+ rows[i].id));
-    newRow.appendChild(createTD("number", rows[i].books_checked_out, "books"+ rows[i].id));
+    newRow.appendChild(createTD("number", rows[i].mem_id, "id" + rows[i].mem_id, true));
+    newRow.appendChild(createTD("text", rows[i].mem_first_name, "firstName" + rows[i].mem_id));
+    newRow.appendChild(createTD("text", rows[i].mem_mid_name, "midName" + rows[i].mem_id));
+    newRow.appendChild(createTD("text", rows[i].mem_last_name, "lastName" + rows[i].mem_id));
+    newRow.appendChild(createTD("email", rows[i].mem_email, "email"+ rows[i].mem_id));
+    newRow.appendChild(createTD("text", rows[i].mem_zip_code, "zipCode"+ rows[i].mem_id));
+    newRow.appendChild(createTD("number", rows[i].books_checked_out, "books"+ rows[i].mem_id));
     // newRow.appendChild(radioInputs(rows[i].unit,rows[i].id));
     // newRow.appendChild(createTD("date", rows[i].date.slice(0,10), "newDate"+ rows[i].id));
     let updateCell = document.createElement("td");
@@ -166,7 +175,7 @@ function deleteRow(rowID) {
       let response = JSON.parse(req.responseText);
       deleteTable();
       if (response["rows"].length != 0){
-        makeTable(response["rows"]);
+        makeLoansTable(response["rows"]);
       }
     } else {
       console.log("Error in network request: " + req.statusText);
@@ -203,7 +212,7 @@ function updateRow(button, id) {
         let response = JSON.parse(req.responseText);
         deleteTable();
         if (response["rows"].length != 0){
-          makeTable(response["rows"]);
+          makeLoansTable(response["rows"]);
         }
       } else {
         console.log("Error in network request: " + req.statusText);
