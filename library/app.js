@@ -28,14 +28,14 @@ const getAllRes = `SELECT title, auth_first_name, auth_last_name, res_date, res_
 const insertBookLoanQuery = `INSERT INTO book_loan (loan_id, book_id)
                             VALUES (?,?);`
 
-const insertLoanQuery = `INSERT INTO loans (mem_id, loan_date, loan_due_date)
-                        VALUES (?, ?, ?);`
+const insertLoanQuery =   `INSERT INTO loans (mem_id, loan_date, loan_due_date)
+                          VALUES (?, ?, ?);`
 
-const insertBookLoanQuery = `INSERT INTO book_loan (loan_id, book_id)
+const insertBookResQuery = `INSERT INTO book_reservation (res_id, book_id)
                             VALUES (?,?);`
 
-const insertLoanQuery = `INSERT INTO loans (mem_id, loan_date, loan_due_date)
-                    VALUES (?, ?, ?);`
+const insertResQuery = `INSERT INTO reservations (mem_id, res_date, res_active)
+                        VALUES (?, ?, ?);`
 
 
 // const updateQuery = "UPDATE workout SET name=?, reps=?, weight=?, unit=?, date=? WHERE id=? " ;
@@ -189,6 +189,28 @@ app.post('/memberAccount',function(req,res,next){
     }
 
     mysql.pool.query(insertBookLoanQuery, [String(result.insertId), book_id], (err, result1) => {
+      if(err){
+        next(err);
+        return;
+      }
+
+      getMemLoans(mem_id,res);
+    });
+  });
+});
+
+// insert res
+app.post('/memberAccountres',function(req,res,next){
+  var {book_id, mem_id, res_id} = req.body;
+  var res_date = new Date().toISOString().slice(0, 19).replace('T', ' ');
+  var res_active = true;
+  mysql.pool.query(insertResQuery, [mem_id, res_date, res_active, res_id], (err, result) => {
+    if(err){
+      next(err);
+      return;
+    }
+
+    mysql.pool.query(insertBookResQuery, [String(result.insertId), book_id], (err, result1) => {
       if(err){
         next(err);
         return;
