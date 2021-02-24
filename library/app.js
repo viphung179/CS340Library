@@ -10,13 +10,20 @@ app.use(CORS());
 
 const getAllMembers = 'SELECT * FROM members' ;
 const insertQuery = "INSERT INTO members (`mem_first_name`, `mem_mid_name`, `mem_last_name`, `mem_email`, `mem_zip_code`, `books_checked_out`) VALUES (?, ?, ?, ?, ?,?)";
-const getAllLoans =   `SELECT title, auth_first_name, auth_last_name, loans.loan_id, loan_date, loan_due_date 
-                      FROM members 
-                      JOIN loans ON members.mem_id = loans.mem_id
-                      JOIN book_loan ON loans.loan_id = book_loan.loan_id
-                      JOIN books ON book_loan.book_id = books.book_id
-                      JOIN authors ON books.auth_id = authors.auth_id
-                      AND members.mem_id = ?;`
+const getAllLoans = `SELECT title, auth_first_name, auth_last_name, loans.loan_id, loan_date, loan_due_date 
+                    FROM members 
+                    JOIN loans ON members.mem_id = loans.mem_id
+                    JOIN book_loan ON loans.loan_id = book_loan.loan_id
+                    JOIN books ON book_loan.book_id = books.book_id
+                    JOIN authors ON books.auth_id = authors.auth_id
+                    AND members.mem_id = ?;`
+// const getAllRes = `SELECT title, auth_first_name, auth_last_name, loan_date, loan_due_date
+//                 FROM members 
+//                 JOIN reservations ON members.mem_id = reservations.mem_id
+//                 JOIN book_reservation ON reservations.res_id = book_reservation.res_id
+//                 JOIN books ON book_reservation.book_id = books.book_id
+//                 JOIN authors ON books.auth_id = authors.auth_id
+//                 AND members.mem_id = :mem_id_from_selection; ?;`
 // const updateQuery = "UPDATE workout SET name=?, reps=?, weight=?, unit=?, date=? WHERE id=? " ;
 // const deleteQuery = "DELETE FROM workout WHERE id=?";
 // const dropTable = "DROP TABLE IF EXISTS workout";
@@ -127,11 +134,25 @@ const getMemLoans = (req, res) => {
       next(err);
       return;
     }
-    res.json({'rows': rows });
+    // res.json({'rows': rows });
+    return rows
   })
 }
+
+// const getMemRes = (req, res) => {
+//   mysql.pool.query(getAllRes, req.query.mem_id, (err, rows, fields) => {
+//     if (err) {
+//       next(err);
+//       return;
+//     }
+//     // res.json({'rows': rows });
+//     return rows
+//   })
+// }
+
 app.get('/memberAccount',function(req,res,next){
-  getMemLoans(req,res);
+  var memLoans = getMemLoans(req,res);
+  // var memRes = getMemRes(req,res);
 });
 
 
