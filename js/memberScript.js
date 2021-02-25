@@ -24,7 +24,7 @@ document.getElementById('signup').addEventListener('click', function(event){
         let response = JSON.parse(req.responseText);
         deleteTable()
         if (response["rows"].length != 0){
-          makeLoansTable(response["rows"])
+          makeTable(response["rows"])
         }
       } else {
         console.log("Error in network request: " + req.statusText);
@@ -32,32 +32,34 @@ document.getElementById('signup').addEventListener('click', function(event){
     
      if(info.mem_first_name !== "" && info.mem_last_name !== "" && info.mem_email !== "" && info.mem_zip_code !== "" ) {
         req.send(JSON.stringify(info));
+     } else {
+       alert("Please enter all required data.")
      }
 
     event.preventDefault();
   });
 
-  document.getElementById('search').addEventListener('click', function(event){
-    let req = new XMLHttpRequest();
-    let nameSearch = document.getElementById('nameSearch').value;
-    let zipSearch = document.getElementById('zipSearch').value;
-    req.open('GET', baseUrl + "?nameSearch=" + nameSearch +  "&zipSearch=" + zipSearch, true);
-    req.addEventListener('load',function(){
-      if (req.status >= 200 && req.status < 400){
-        let response = JSON.parse(req.responseText);
-        deleteTable()
-        if (response["rows"].length != 0){
-          makeLoansTable(response["rows"]);
-          // console.log(response["rows"]);
-        }
-      } else {
-        console.log('Error in network request: ' + req.statusText);
+document.getElementById('search').addEventListener('click', function(event){
+  let req = new XMLHttpRequest();
+  let nameSearch = document.getElementById('nameSearch').value;
+  let zipSearch = document.getElementById('zipSearch').value;
+  req.open('GET', baseUrl + "?nameSearch=" + nameSearch +  "&zipSearch=" + zipSearch, true);
+  req.addEventListener('load',function(){
+    if (req.status >= 200 && req.status < 400){
+      let response = JSON.parse(req.responseText);
+      deleteTable()
+      if (response["rows"].length != 0){
+        makeTable(response["rows"]);
+        // console.log(response["rows"]);
       }
-    })
-    req.send(null);
+    } else {
+      console.log('Error in network request: ' + req.statusText);
+    }
+  })
+  req.send(null);
 
-    event.preventDefault();
-  });
+  event.preventDefault();
+});
 
 
 function getdata() {
@@ -67,7 +69,7 @@ function getdata() {
       if (req.status >= 200 && req.status < 400){
         let response = JSON.parse(req.responseText);
         if (response["rows"].length != 0){
-          makeLoansTable(response["rows"]);
+          makeTable(response["rows"]);
           // console.log(response["rows"]);
         }
       } else {
@@ -77,15 +79,15 @@ function getdata() {
   req.send(null);
 }
 
-function makeLoansTable(rows) {
+function makeTable(rows) {
   let newTable = document.createElement("table");
   newTable.id = 'table';
   newTable.classList.add('container', 'mb-5');
   document.body.appendChild(newTable);
 
-  makeLoanHeaders(newTable);
+  makeHeaders(newTable);
 
-  makeLoanRow(rows, newTable);
+  makeRow(rows, newTable);
 
   newTable.addEventListener('click',function(event){
     let target = event.target;
@@ -112,7 +114,7 @@ function makeLoansTable(rows) {
   })
 }
 
-function makeLoanHeaders(newTable) {
+function makeHeaders(newTable) {
   let header = document.createElement("thead");
   newTable.appendChild(header);
   let headerName = ['id','First Name', 'Middle Name', 'Last Name', 'Email', 'Zip Code', 'Books Checked Out'];
@@ -128,7 +130,7 @@ function makeLoanHeaders(newTable) {
     }
 }
 
-function makeLoanRow(rows, newTable){
+function makeRow(rows, newTable){
   let body = document.createElement("tbody");
   newTable.appendChild(body);
   for (let i = 0; i < rows.length; i++) {
@@ -175,7 +177,7 @@ function deleteRow(rowID) {
       let response = JSON.parse(req.responseText);
       deleteTable();
       if (response["rows"].length != 0){
-        makeLoansTable(response["rows"]);
+        makeTable(response["rows"]);
       }
     } else {
       console.log("Error in network request: " + req.statusText);
@@ -212,7 +214,7 @@ function updateRow(button, id) {
         let response = JSON.parse(req.responseText);
         deleteTable();
         if (response["rows"].length != 0){
-          makeLoansTable(response["rows"]);
+          makeTable(response["rows"]);
         }
       } else {
         console.log("Error in network request: " + req.statusText);

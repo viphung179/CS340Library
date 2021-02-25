@@ -3,7 +3,7 @@ var mysql = require('./dbcon.js');
 var CORS = require('cors')
 
 var app = express();
-app.set('port', 3103);
+app.set('port', 5249);
 app.use(express.json())
 app.use(express.urlencoded({extended: false}))
 app.use(CORS());
@@ -31,6 +31,36 @@ const getAuthorLastName = "SELECT * FROM authors WHERE auth_last_name=?";
 const getAuthorFirstLastName = "SELECT * FROM authors  WHERE auth_first_name =? AND auth_last_name =?";
 
 
+// Members page queries
+const getAllMembers = 'SELECT * FROM members' ;
+const insertMemberQuery = "INSERT INTO members (`mem_first_name`, `mem_mid_name`, `mem_last_name`, `mem_email`, `mem_zip_code`, `books_checked_out`) VALUES (?, ?, ?, ?, ?,?)";
+const deleteMemQuery = "DELETE FROM members WHERE mem_id=?";
+
+
+// Member Account page queries
+const getAllLoans = `SELECT title, auth_first_name, auth_last_name, loans.loan_id, loan_date, loan_due_date 
+                    FROM members 
+                    JOIN loans ON members.mem_id = loans.mem_id
+                    JOIN book_loan ON loans.loan_id = book_loan.loan_id
+                    JOIN books ON book_loan.book_id = books.book_id
+                    JOIN authors ON books.auth_id = authors.auth_id
+                    AND members.mem_id = ?;`
+const getAllRes = `SELECT title, auth_first_name, auth_last_name, res_date, res_active
+                  FROM members 
+                  JOIN reservations ON members.mem_id = reservations.mem_id
+                  JOIN book_reservation ON reservations.res_id = book_reservation.res_id
+                  JOIN books ON book_reservation.book_id = books.book_id
+                  JOIN authors ON books.auth_id = authors.auth_id
+                  AND members.mem_id = ?;`
+const insertBookLoanQuery = `INSERT INTO book_loan (loan_id, book_id)
+                            VALUES (?,?);`
+const insertLoanQuery =   `INSERT INTO loans (mem_id, loan_date, loan_due_date)
+                          VALUES (?, ?, ?);`
+const insertBookResQuery = `INSERT INTO book_reservation (res_id, book_id)
+                            VALUES (?,?);`
+const insertResQuery = `INSERT INTO reservations (mem_id, res_date, res_active)
+                        VALUES (?, ?, ?);`
+
 // sends the entire table/data back to the client
 const getAllData = (res) => {
   mysql.pool.query(getAllQuery, (err, rows, field) => {
@@ -42,6 +72,74 @@ const getAllData = (res) => {
   });
 };
 
+// functions for MEMBERS
+const getMemAllData = (res) => {
+  mysql.pool.query(getAllMembers, (err, rows, fields) => {
+    if (err) {
+      next(err);
+      return;
+    }
+    // console.log(rows[0])
+    res.json({'rows': rows });
+  })
+}
+
+const getMemSearchResults = (req, res) => {
+  if (req.query.nameSearch !== "" && req.query.zipSearch !== "") {
+    mysql.pool.query('SELECT * FROM members WHERE mem_last_name = ? AND mem_zip_code = ?', [req.query.nameSearch,req.query.zipSearch], (err, rows, fields) => {
+      if (err) {
+        next(err);
+        return;
+      }
+      res.json({'rows': rows });
+    })
+  } else if (req.query.nameSearch !== "") {
+    mysql.pool.query('SELECT * FROM members WHERE mem_last_name =?', req.query.nameSearch, (err, rows, fields) => {
+      if (err) {
+        next(err);
+        return;
+      }
+      res.json({'rows': rows });
+    })
+  } else if (req.query.zipSearch !== "") {
+    mysql.pool.query('SELECT * FROM members WHERE mem_zip_code =?', req.query.zipSearch, (err, rows, fields) => {
+      if (err) {
+        next(err);
+        return;
+      }
+      res.json({'rows': rows });
+    })
+  } else {
+    getMemAllData(res);
+  }
+ 
+}
+
+// functions for MEMBERACCOUNT
+let memLoanRes = {}
+const getMemLoans = (req, res) => {
+  mysql.pool.query(getAllLoans, req, (err, rows, fields) => {
+    if (err) {
+      console.log('get mems loan')
+      next(err);
+      return;
+    }
+    memLoanRes.loans = rows
+    // console.log(memLoanRes.loans)
+    getMemRes(req,res)
+  })
+}
+
+const getMemRes = (req, res) => {
+  mysql.pool.query(getAllRes, req, (err, rows, fields) => {
+    if (err) {
+      next(err)
+      return;
+    }
+    memLoanRes.reserv = rows;
+    res.json({'loans': memLoanRes.loans,'reserv': memLoanRes.reserv});
+  })
+}
 
 // GET route for BOOKS
 app.get('/books',function(req,res,next){
@@ -245,6 +343,100 @@ app.post('/authors',function(req,res,next){
       return;
     }
     getAllData(res);
+  });
+});
+
+// GET MEMBERS
+app.get('/members',function(req,res,next){
+  if (Object.keys(req.query).length !== 0) {
+    // console.log(req.query)
+    getMemSearchResults(req,res);
+  } else {
+    // console.log(req.query)
+    getMemAllData(res);
+  }
+});
+
+// POST MEMBERS
+app.post('/members',function(req,res,next){
+var {mem_first_name, mem_mid_name, mem_last_name, mem_email, mem_zip_code, books_checked_out, mem_id} = req.body;
+mysql.pool.query(insertMemberQuery, [mem_first_name, mem_mid_name, mem_last_name, mem_email, mem_zip_code, books_checked_out, mem_id], (err, result) => {
+  if(err){
+    next(err);
+    return;
+  }
+  // console.log(result)
+  getMemAllData(res);
+});
+});
+
+// DELETE MEMBERS
+app.delete('/members',function(req,res,next){
+var mem_id = req.body.id;
+mysql.pool.query(deleteMemQuery, mem_id, (err, result) => {
+  if(err){
+    next(err);
+    return;
+  }
+  getMemAllData(res);
+});
+});
+
+// GET LOAN and RESERVATIONS
+app.get('/memberAccount',function(req,res,next){
+  let mem_id = req.query.mem_id;
+  getMemLoans(req.query.mem_id,res);
+});
+
+
+// POST LOAN
+app.post('/memberAccount',function(req,res,next){
+  var {book_id, mem_id, loan_id} = req.body;
+  var loan_date = new Date().toISOString().slice(0, 19).replace('T', ' ');
+  var loan_due_date = loan_date;
+  mysql.pool.query(insertLoanQuery, [mem_id, loan_date, loan_due_date, loan_id], (err, result) => {
+    if(err){
+      next(err);
+      return;
+    }
+
+    mysql.pool.query(insertBookLoanQuery, [String(result.insertId), book_id], (err, result1) => {
+      if(err){
+        next(err);
+        return;
+      }
+
+      mysql.pool.query('UPDATE members SET books_checked_out = books_checked_out + 1 WHERE mem_id= ?', mem_id, (err, result) => {
+        if(err){
+          next(err);
+          return;
+        }})
+
+        getMemLoans(mem_id,res);
+    });
+  });
+});
+
+
+// POST RESERVATION
+app.post('/memberAccountres',function(req,res,next){
+  var {book_id, mem_id, res_id} = req.body;
+  var res_date = new Date().toISOString().slice(0, 19).replace('T', ' ');
+  var res_active = true;
+  mysql.pool.query(insertResQuery, [mem_id, res_date, res_active, res_id], (err, result) => {
+    if(err){
+      next(err);
+      return;
+    }
+
+    mysql.pool.query(insertBookResQuery, [String(result.insertId), book_id], (err, result1) => {
+      if(err){
+        next(err);
+        return;
+      }
+
+      getMemLoans(mem_id,res);
+    });
   });
 });
 

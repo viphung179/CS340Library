@@ -17,10 +17,10 @@ userName.textContent = 'Member Name: ' + currMemName;
 userName.classList.add('lead', 'pl-3');
 document.body.appendChild(userName);
 
-let userBooks = document.createElement('h4');
-userBooks.textContent = 'Books Checked Out: ' + currBooks;
-userBooks.classList.add('lead', 'pl-3');
-document.body.appendChild(userBooks);
+// let userBooks = document.createElement('h4');
+// userBooks.textContent = 'Books Checked Out: ' + currBooks;
+// userBooks.classList.add('lead', 'pl-3');
+// document.body.appendChild(userBooks);
 
 document.addEventListener('DOMContentLoaded', getdata);
 
@@ -35,7 +35,7 @@ document.getElementById('loanBook').addEventListener('click', function(event){
         let response = JSON.parse(req.responseText);
         deleteTable()
         if (response["loans"].length != 0){
-          makeLoansTable(response["loans"]);
+          makeTable(response["loans"]);
         }
 
         if (response["reserv"].length != 0){
@@ -63,7 +63,7 @@ document.getElementById('resBook').addEventListener('click', function(event){
         let response = JSON.parse(req.responseText);
         deleteTable()
         if (response["loans"].length != 0){
-          makeLoansTable(response["loans"]);
+          makeTable(response["loans"]);
         }
 
         if (response["reserv"].length != 0){
@@ -80,9 +80,6 @@ document.getElementById('resBook').addEventListener('click', function(event){
     event.preventDefault();
 });
 
-
-
-
 function getdata() {
   let req = new XMLHttpRequest();
   req.open('GET', baseUrl + "?mem_id=" + currMemId, true);
@@ -91,7 +88,7 @@ function getdata() {
         let response = JSON.parse(req.responseText);
         // console.log(typeof response)
         if (response["loans"].length != 0){
-          makeLoansTable(response["loans"]);
+          makeTable(response["loans"]);
         }
 
         if (response["reserv"].length != 0){
@@ -104,7 +101,7 @@ function getdata() {
   req.send(null);
 }
 
-function makeLoansTable(rows) {
+function makeTable(rows) {
   let newTable = document.createElement("table");
   newTable.id = 'loanTable';
   newTable.classList.add('container', 'mb-5');
@@ -115,9 +112,9 @@ function makeLoansTable(rows) {
   document.body.appendChild(newCardHeader);
   document.body.appendChild(newTable);
 
-  makeLoanHeaders(newTable);
+  makeHeaders(newTable);
 
-  makeLoanRow(rows, newTable);
+  makeRow(rows, newTable);
 
   newTable.addEventListener('click',function(event){
     let target = event.target;
@@ -133,7 +130,7 @@ function makeLoansTable(rows) {
   })
 }
 
-function makeLoanHeaders(newTable) {
+function makeHeaders(newTable) {
   let header = document.createElement("thead");
   newTable.appendChild(header);
   let headerName = ['id','Title', 'Author', 'Loan Date', 'Due Date'];
@@ -149,7 +146,7 @@ function makeLoanHeaders(newTable) {
     }
 }
 
-function makeLoanRow(rows, newTable){
+function makeRow(rows, newTable){
   let body = document.createElement("tbody");
   newTable.appendChild(body);
   for (let i = 0; i < rows.length; i++) {
@@ -191,8 +188,11 @@ function makeResTable(rows) {
 
   newTable.addEventListener('click',function(event){
     let target = event.target;
+    let targetRow = target.parentNode.parentNode
+    let targetBody = targetRow.parentNode
     let targetId = target.parentNode.parentNode.firstElementChild.textContent;
     if (target.tagName != 'BUTTON') return;
+    // if (targetBody.id ==='resBody'){
     if (target.textContent == "Delete"){
       deleteRow(targetId);
     } else if (target.textContent == "Update") {
@@ -221,45 +221,35 @@ function makeResHeaders(newTable) {
 
 function makeResRow(rows, newTable){
   let body = document.createElement("tbody");
+  body.id = 'resBody'
   newTable.appendChild(body);
   for (let i = 0; i < rows.length; i++) {
     let newRow = document.createElement("tr");
     newRow.appendChild(createTD("number", rows[i].res_id, "resId" + rows[i].id, true));
     newRow.appendChild(createTD("text", rows[i].title, "resTitle" + rows[i].id));
     newRow.appendChild(createTD("text", rows[i].auth_first_name + " " + rows[i].auth_last_name, "resAuthName" + rows[i].id));
-    // newRow.appendChild(createTD("text", rows[i].mem_last_name, "lastName" + rows[i].id));
-    // newRow.appendChild(createTD("email", rows[i].mem_email, "email"+ rows[i].id));
-    // newRow.appendChild(createTD("text", rows[i].mem_zip_code, "zipCode"+ rows[i].id));
-    // newRow.appendChild(createTD("number", rows[i].books_checked_out, "books"+ rows[i].id));
-    // newRow.appendChild(radioInputs(rows[i].unit,rows[i].id));
     newRow.appendChild(createTD("date", rows[i].res_date.slice(0,10), "resDate"+ rows[i].id));
-    newRow.appendChild(createTD("text", rows[i].res_active, "resStatus" + rows[i].id));
+    let rowStatus = "Inactive"
+    if(rows[i].res_active == 0){
+      rowStatus = "Inactive"
+    } else {
+      rowStatus = "Active"
+    }
+    console.log(rowStatus)
+    newRow.appendChild(createTD("text", rowStatus, "resStatus" + rows[i].id));
     let updateCell = document.createElement("td");
-    // let deleteCell = document.createElement("td");
-    // let viewCell = document.createElement("td");
     let updateButton = document.createElement("button");
-    // let deleteButton = document.createElement("button");
-    // let viewButton = document.createElement("button");
     updateButton.textContent = "Update";
-    // deleteButton.textContent = "Delete";
-    // viewButton.textContent = "View Loans/Reservations";
-    // viewButton.href = "MemberAccount.html"
     updateButton.classList.add("btn","btn-info");
-    // deleteButton.classList.add("btn","btn-info");
-    // viewButton.classList.add("btn","btn-info");
     updateCell.appendChild(updateButton);
-    // deleteCell.appendChild(deleteButton);
-    // viewCell.appendChild(viewButton);
     newRow.appendChild(updateCell);
-    // newRow.appendChild(deleteCell);
-    // newRow.appendChild(viewCell)
     body.appendChild(newRow);
   }
 }
 
 // function deleteRow(rowID) {
 //   let req = new XMLHttpRequest();
-//   let info = {id: rowID };
+//   let info = {id: rowID, mem_id: currMemId};
 //   req.open('DELETE', baseUrl, true);
 //   req.setRequestHeader('Content-Type', 'application/json');
 //   req.addEventListener('load',function(){
