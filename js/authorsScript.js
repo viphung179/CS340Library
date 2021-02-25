@@ -14,6 +14,7 @@ const deleteTable = () => {
 const makeTable = (allRows) => {
     deleteTable();
     let table = document.createElement("table");
+    table.classList.add('container');
     document.getElementById("workoutsTable").appendChild(table);
     makeHeaderRow(table);
     for(row in allRows){
