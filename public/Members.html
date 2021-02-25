@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Members</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+</head>
+<body>
+  <nav class="navbar navbar-expand-sm navbar-light bg-transparent">
+    <div class="container ">
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup"
+        aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse d-flex justify-content-center" id="navbarNavAltMarkup">
+        <div id="topMenu" class="navbar-nav lead text-uppercase">
+          <a class="nav-item nav-link menuName" href="index.html">Home</a>
+          <a class="nav-item nav-link menuName" href="books.html">Books</a>
+          <a class="nav-item nav-link menuName" href="authors.html">Authors</a>
+          <a class="nav-item nav-link active menuName text-info" href="Members.html"><b>Members</b><span class="sr-only">(current)</span></a>
+        </div>
+      </div>
+    </div>
+  </nav>
+  <section class='container col-6 pt-5'> 
+    <div class="row">
+      <div class='col-6'>
+        <div class="card text-dark">
+          <form>
+              <h4 class='card-header'><b>Member Sign Up</b> (* is required)</h4>
+              <div class=card-body>
+                <div class="form-group">
+                    <label for="fname">First Name*</label>
+                    <input type="text" class="form-control" id="fname" placeholder="">
+                </div>
+
+                <div class="form-group">
+                    <label for="mname">Middle Name</label>
+                    <input type="text" class="form-control" id="mname" placeholder="">
+                </div>
+
+                <div class="form-group">
+                    <label for="lname">Last Name*</label>
+                    <input type="text" class="form-control" id="lname" placeholder="">
+                </div>
+
+                <div class="form-group">
+                  <label for="email">Email*</label>
+                  <input type="email" class="form-control" id="email" placeholder="">
+                </div>
+
+                <div class="form-group">
+                    <label for="name">Zip Code*</label>
+                    <input type="text" class="form-control" id="zip" placeholder="">
+                </div>
+                <button type="submit" class="btn btn-info" id="signup">Sign Up</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div class='col-6'>
+        <div class="card shadow text-dark">
+          <form>
+            <h4 class='card-header'><b>Member Search</b></h4>
+            <div class=card-body>
+              <div class="form-group">
+                  <label for="lname">Last Name</label>
+                  <input type="text" class="form-control" id="nameSearch" placeholder="">
+              </div>
+
+              <div class="form-group">
+                  <label for="name">Zip Code</label>
+                  <input type="text" class="form-control" id="zipSearch" placeholder="">
+              </div>
+              <button type="submit" class="btn btn-info" id="search">Search</button>
+              <!-- <p class= 'card-text'>leave fields blank to see all members</p> -->
+          </div>
+        </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="pt-5"> 
+    <!-- <div class="text-dark"> -->
+      <h4 class='card-header bg-secondary text-white text-center' >View/Update Members</h4>
+        <!-- <table class = 'container'>
+          <thead>
+            <tr>
+              <th>First Name</th>
+              <th>Middle Name</th>
+              <th>Last Name</th>
+              <th>Email</th>
+              <th>Zip Code</th>
+              <th>Books Checked Out</th>
+              <th></th>
+              <th></th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><input type="text" placeholder="John" disabled = true></td>
+              <td><input type="text" placeholder="" disabled = true></td>
+              <td><input type="text" placeholder="Smith" disabled = true></td>
+              <td><input type="email" placeholder="johnsmith@gmail.com" disabled = true></td>
+              <td><input type="text" placeholder="12345" disabled = true></td>
+              <td><input type="number" placeholder="4" disabled = true></td>
+              <td><input type="submit" id="update" value="Update" class="btn btn-info"></td>
+              <td> <input type="submit" id="delete" value="Delete" class="btn btn-info"></td>
+              <td><a href="MemberAccount.html" class="btn btn-info">View Loans/Reservations</a></td>
+            </tr>
+          </tbody>
+        </table>               -->
+    <!-- </div> -->
+  </div>
+
+    <script src="js/memberScript.js"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script> 
+</body>
+
+</html>

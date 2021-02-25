@@ -7,6 +7,7 @@ app.set('port', 5249);
 app.use(express.json())
 app.use(express.urlencoded({extended: false}))
 app.use(CORS());
+app.use(express.static('public'));
 
 // Book page queries 
 const getAllQuery = 'SELECT * FROM books';  // gets all the rows from the database
