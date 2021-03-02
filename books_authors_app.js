@@ -3,7 +3,7 @@ var mysql = require('./dbcon.js');
 var CORS = require('cors')
 
 var app = express();
-app.set('port', 3103);
+app.set('port', 5149);
 app.use(express.json())
 app.use(express.urlencoded({extended: false}))
 app.use(CORS());
@@ -49,22 +49,23 @@ const getAllLoans = `SELECT title, auth_first_name, auth_last_name, loans.loan_i
                     JOIN books ON book_loan.book_id = books.book_id
                     JOIN authors ON books.auth_id = authors.auth_id
                     AND members.mem_id = ?;`
-const getAllRes = `SELECT title, auth_first_name, auth_last_name, res_date, res_active
-                  FROM members 
-                  JOIN reservations ON members.mem_id = reservations.mem_id
-                  JOIN book_reservation ON reservations.res_id = book_reservation.res_id
-                  JOIN books ON book_reservation.book_id = books.book_id
-                  JOIN authors ON books.auth_id = authors.auth_id
-                  AND members.mem_id = ?;`
+// const getAllRes = `SELECT title, auth_first_name, auth_last_name, res_date, res_active
+//                   FROM members 
+//                   JOIN reservations ON members.mem_id = reservations.mem_id
+//                   JOIN book_reservation ON reservations.res_id = book_reservation.res_id
+//                   JOIN books ON book_reservation.book_id = books.book_id
+//                   JOIN authors ON books.auth_id = authors.auth_id
+//                   AND members.mem_id = ?;`
 const insertBookLoanQuery = `INSERT INTO book_loan (loan_id, book_id)
                             VALUES (?,?);`
 const insertLoanQuery =   `INSERT INTO loans (mem_id, loan_date, loan_due_date)
                           VALUES (?, ?, ?);`
-const insertBookResQuery = `INSERT INTO book_reservation (res_id, book_id)
-                            VALUES (?,?);`
-const insertResQuery = `INSERT INTO reservations (mem_id, res_date, res_active)
-                        VALUES (?, ?, ?);`
+// const insertBookResQuery = `INSERT INTO book_reservation (res_id, book_id)
+//                             VALUES (?,?);`
+// const insertResQuery = `INSERT INTO reservations (mem_id, res_date, res_active)
+//                         VALUES (?, ?, ?);`
 const countLoansQuery = `SELECT COUNT(*) FROM loans WHERE mem_id = ?;`
+const updateLoanQuery = 'UPDATE loans SET loan_due_date=? WHERE loan_id=?';
 
 // sends the entire table/data back to the client
 const getAllData = (res) => {
@@ -137,21 +138,21 @@ const getMemLoans = (req, res) => {
         return;
       }
       memLoanRes.loans = rows
-      getMemRes(req,res)
+      res.json({'loans': memLoanRes.loans});
     })
   })
 }
 
-const getMemRes = (req, res) => {
-  mysql.pool.query(getAllRes, req, (err, rows, fields) => {
-    if (err) {
-      next(err)
-      return;
-    }
-    memLoanRes.reserv = rows;
-    res.json({'loans': memLoanRes.loans,'reserv': memLoanRes.reserv});
-  })
-}
+// const getMemRes = (req, res) => {
+//   mysql.pool.query(getAllRes, req, (err, rows, fields) => {
+//     if (err) {
+//       next(err)
+//       return;
+//     }
+//     memLoanRes.reserv = rows;
+//     res.json({'loans': memLoanRes.loans,'reserv': memLoanRes.reserv});
+//   })
+// }
 
 // GET route for BOOKS
 app.get('/books',function(req,res,next){
@@ -439,6 +440,7 @@ app.post('/memberAccount',function(req,res,next){
   // console.log(toISOLocal(loan_due_date))
   // loan_due_date = addDays(loan_due_date, 90)
   // loan_due_date = loan_due_date.toISOString().slice(0, 19).replace('T', ' ')
+  console.log(loan_due_date);
   mysql.pool.query(insertLoanQuery, [mem_id, loan_date, loan_due_date, loan_id], (err, result) => {
     if(err){
       next(err);
@@ -462,28 +464,45 @@ app.post('/memberAccount',function(req,res,next){
   });
 });
 
-
-// POST RESERVATION
-app.post('/memberAccountres',function(req,res,next){
-  var {book_id, mem_id, res_id} = req.body;
-  var res_date = new Date().toISOString().slice(0, 19).replace('T', ' ');
-  var res_active = true;
-  mysql.pool.query(insertResQuery, [mem_id, res_date, res_active, res_id], (err, result) => {
+// UPDATE LOAN
+app.put('/memberAccount',function(req,res,next){
+  var {loan_id, loan_due_date, mem_id} = req.body
+  // loan_due_date = loan_due_date.slice(0,19).replace('T', ' ');
+  loan_due_date = new Date(loan_due_date)
+  loan_due_date = loan_due_date.toISOString().slice(0, 19).replace('T', ' ')
+  console.log(loan_id)
+  console.log(loan_due_date)
+  mysql.pool.query(updateLoanQuery,[loan_due_date, loan_id], function(err, result){
     if(err){
       next(err);
       return;
     }
-
-    mysql.pool.query(insertBookResQuery, [String(result.insertId), book_id], (err, result1) => {
-      if(err){
-        next(err);
-        return;
-      }
-
-      getMemLoans(mem_id,res);
-    });
+    getMemLoans(mem_id,res);
   });
 });
+
+
+// POST RESERVATION
+// app.post('/memberAccountres',function(req,res,next){
+//   var {book_id, mem_id, res_id} = req.body;
+//   var res_date = new Date().toISOString().slice(0, 19).replace('T', ' ');
+//   var res_active = true;
+//   mysql.pool.query(insertResQuery, [mem_id, res_date, res_active, res_id], (err, result) => {
+//     if(err){
+//       next(err);
+//       return;
+//     }
+
+//     mysql.pool.query(insertBookResQuery, [String(result.insertId), book_id], (err, result1) => {
+//       if(err){
+//         next(err);
+//         return;
+//       }
+
+//       getMemLoans(mem_id,res);
+//     });
+//   });
+// });
 
 
 // deletes BOOKS instance.
