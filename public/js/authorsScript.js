@@ -75,16 +75,6 @@ const makeInput = (type1, value1, cell) => {
         input.value= value1["auth_last_name"];
         input.disabled = true;
     }
-    // else if (type1 == 4){
-    //     input.type = "number";
-    //     input.value= value1["year"];
-    //     input.disabled = true;
-    // }
-    // else if (type1 == 5){
-    //     input.type= "number";
-    //     input.value= value1["copies_available"];
-    //     input.disabled = true;
-    // }
     cell.appendChild(label);
     cell.appendChild(input);
     cell.appendChild(form);
@@ -133,8 +123,6 @@ const doneUpdate = (rowData, table) => {
                     inputFname = table.children[i].children[1].children[1].value;
                     inputMname = table.children[i].children[2].children[1].value;
                     inputLname = table.children[i].children[3].children[1].value;
-                    // inputUnit = table.children[i].children[4].children[1].value;
-                    // inputDate = table.children[i].children[5].children[1].value;
             }
         }
         let req = new XMLHttpRequest();
@@ -199,8 +187,6 @@ const enableRow = (rowId, table) => {
                 table.children[i].children[1].children[1].disabled = false;
                 table.children[i].children[2].children[1].disabled = false;
                 table.children[i].children[3].children[1].disabled = false;
-                // table.children[i].children[4].children[1].disabled = false;
-                // table.children[i].children[5].children[1].disabled = false;
             }
         }
 };
@@ -214,8 +200,6 @@ const disableRow = (rowId, table) => {
             table.children[i].children[1].children[1].disabled = true;
             table.children[i].children[2].children[1].disabled = true;
             table.children[i].children[3].children[1].disabled = true;
-            // table.children[i].children[4].children[1].disabled = true;
-            // table.children[i].children[5].children[1].disabled = true;
         }
     }
 };
@@ -269,6 +253,31 @@ const displayNewData = () => {
     });
 }
 
+// populating drop down menu for author ID for add book
+document.getElementById('auth_id').addEventListener('click', function(event){
+    var req = new XMLHttpRequest();
+    var select = document.getElementById('select')
+    req.open('GET',baseUrl, true);
+    req.send(null);
+    req.addEventListener('load',function(){
+        if(req.status >= 200 && req.status < 400){
+            let response = JSON.parse(req.responseText);
+            data = JSON.parse(response.results)
+            for(let i=0; i<data.length; i++ ) {
+                var menuItem = document.createElement('option')
+                menuItem.textContent = [data[i]['auth_first_name'] + ' ' + data[i]['auth_last_name'] ];
+                menuItem.value = data[i]['auth_id'] ;
+                select.appendChild(menuItem)
+            }
+        } else {
+            console.log("Error in network request: " + req.statusText);
+          }
+    });
+    event.preventDefault();
+    while(select.firstChild){
+        select.removeChild(select.firstChild);
+    }
+})
 
 // POST request
 document.getElementById('addAuthor').addEventListener('click', function(event){
@@ -282,20 +291,29 @@ document.getElementById('addAuthor').addEventListener('click', function(event){
     req.addEventListener('load',function(){
       if(req.status >= 200 && req.status < 400){
         let response = JSON.parse(req.responseText);
+        // places text on badge
+        document.getElementById("message").textContent = "Author Added"
         displayNewData();
       } else {
         console.log("Error in network request: " + req.statusText);
       }});
     
      if(payload.auth_first_name !== "" && payload.auth_last_name !== "") {
+        // clears form fields.
+        document.getElementById("fname").value = "";
+        document.getElementById("mname").value = "";
+        document.getElementById("lname").value = "";
         req.send(JSON.stringify(payload));
+     } 
+     else {
+        alert("Please enter all required fields to add an author.")
      }
-    // clears form fields.
-    document.getElementById("fname").value = "";
-    document.getElementById("mname").value = "";
-    document.getElementById("lname").value = "";
     event.preventDefault();
   });
 
+// removes badge 
+document.getElementById('fname').addEventListener('click', function(){
+    document.getElementById("message").textContent = ""
+})
 
-// getData();
+displayNewData();

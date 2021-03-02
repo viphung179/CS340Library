@@ -32,20 +32,21 @@
             <div class=card-body>
               <div class="form-group">
                   <label for="name">First Name*</label>
-                  <input type="text" class="form-control" id="fname" placeholder="">
+                  <input type="text" class="form-control" id="fname" placeholder=""/>
               </div>
               <div class="form-group">
                   <label for="name">Middle Name</label>
-                  <input type="text" class="form-control" id="mname" placeholder="">
+                  <input type="text" class="form-control" id="mname" placeholder="" />
               </div>
               <div class="form-group">
                   <label for="name">Last Name*</label>
-                  <input type="text" class="form-control" id="lname" placeholder="">
+                  <input type="text" class="form-control" id="lname" placeholder=""/>
               </div>
               <button type="submit" class="btn btn-info" id="addAuthor">Add Author</button>
           </div>
         </form>
       </div>
+      <span class=" container badge alert-info" id="message"></span>
       </div>
     <br>
     <form class='col-6'>
@@ -54,12 +55,13 @@
         <div class=card-body> 
           <div class="form-group">
             <label for="auth_id">Author ID</label>
-            <input type="text" class="form-control" id="auth_id" placeholder="">
+            <input type="text" list="select" id ='auth_id' class="form-control" placeholder="" >
+            <datalist id="select"></datalist>
           </div>
 
           <div class="form-group">
             <label for="fname">First Name</label>
-            <input type="text" class="form-control" id="first_name" placeholder="">
+            <input type="text" class="form-control" id="first_name" placeholder="" >
           </div>
 
           <div class="form-group">
@@ -105,6 +107,14 @@
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script> 
-</body>
+    <script>
+      $(document).ready(function(){
+         $('[data-toggle="popover"]').popover();
+      });
+      $('.popover-dismiss').popover({
+          trigger: 'focus'
+        })
+    </script>
+  </body>
 
 </html>

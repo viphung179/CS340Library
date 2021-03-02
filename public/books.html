@@ -32,35 +32,35 @@
           <div class=card-body>
             <div class="form-group">
               <label for="title">Title*</label>
-              <input type="text" class="form-control" id="title" placeholder="">
+              <input type="text" class="form-control" id="title" >
             </div>
 
             <div class="form-group">
               <label for="isbn">ISBN*</label>
-              <input type="text" class="form-control" id="isbn" placeholder="">
+              <input type="text" class="form-control" id="isbn" >
             </div>
 
             <div class="form-group">
               <label for="auth_id">Author ID*</label>
-              <!-- <input type="number" class="form-control" id="auth_id" placeholder=""> -->
-              <select class="form-control" id="dropDownMenu">
-                <!-- <option id="menuOptions"></option> -->
-              </select>
+                <input type="text" list="select" id ='auth_id' class="form-control" >
+                <datalist id="select"></datalist>
+
             </div>
 
             <div class="form-group">
               <label for="year">Year*</label>
-              <input type="number" class="form-control" id="year" placeholder="">
+              <input type="number" class="form-control" id="year" >
             </div>
 
             <div class="form-group">
               <label for="copies">Copies Available*</label>
-              <input type="number" class="form-control" id="copies" placeholder="">
+              <input type="number" class="form-control" id="copies" >
             </div>
             <button type="submit" class="btn btn-info" id="addBook">Add Book</button>
           </div>
         </form>
       </div>
+      <span class=" container badge alert-info" id="message"></span>
       </div>
       <br>
       <div class='col-6'>
