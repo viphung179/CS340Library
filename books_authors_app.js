@@ -43,7 +43,7 @@ const updateMembers = 'UPDATE members SET mem_first_name=?, mem_mid_name=?, mem_
 
 
 // Member Account page queries
-const getAllLoans = `SELECT title, auth_first_name, auth_last_name, loans.loan_id, loan_date, loan_due_date 
+const getAllLoans = `SELECT title, auth_first_name, auth_last_name, loans.loan_id, loan_date, loan_due_date, books.book_id 
                     FROM members 
                     JOIN loans ON members.mem_id = loans.mem_id
                     JOIN book_loan ON loans.loan_id = book_loan.loan_id
@@ -374,7 +374,8 @@ app.get('/members',function(req,res,next){
 // POST MEMBERS
 app.post('/members',function(req,res,next){
 var {mem_first_name, mem_mid_name, mem_last_name, mem_email, mem_zip_code, mem_id} = req.body;
-mysql.pool.query(insertMemberQuery, [mem_first_name, mem_mid_name, mem_last_name, mem_email, mem_zip_code, mem_id], (err, result) => {
+var books_checked_out = 0
+mysql.pool.query(insertMemberQuery, [mem_first_name, mem_mid_name, mem_last_name, mem_email, mem_zip_code, books_checked_out], (err, result) => {
   if(err){
     next(err);
     return;
@@ -470,8 +471,8 @@ app.put('/memberAccount',function(req,res,next){
   // loan_due_date = loan_due_date.slice(0,19).replace('T', ' ');
   loan_due_date = new Date(loan_due_date)
   loan_due_date = loan_due_date.toISOString().slice(0, 19).replace('T', ' ')
-  console.log(loan_id)
-  console.log(loan_due_date)
+  // console.log(loan_id)
+  // console.log(loan_due_date)
   mysql.pool.query(updateLoanQuery,[loan_due_date, loan_id], function(err, result){
     if(err){
       next(err);
