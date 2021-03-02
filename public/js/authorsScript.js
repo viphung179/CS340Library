@@ -126,42 +126,37 @@ const doneUpdate = (rowData, table) => {
         let rowId = rowData["auth_id"]
         console.log("id: ", rowId)
         let numElement = table.childElementCount
-        let inputName, inputReps, inputWeight, inputUnit, inputDate;
+        let inputFname, inputMname, inputLname;
         for(let i=1; i< numElement; i++ ){
             parent = table.children[i].children[0].children[1].value;
             if (rowId == parent){
-                    inputName = table.children[i].children[1].children[1].value;
-                    inputReps = table.children[i].children[2].children[1].value;
-                    inputWeight = table.children[i].children[3].children[1].value;
+                    inputFname = table.children[i].children[1].children[1].value;
+                    inputMname = table.children[i].children[2].children[1].value;
+                    inputLname = table.children[i].children[3].children[1].value;
                     // inputUnit = table.children[i].children[4].children[1].value;
                     // inputDate = table.children[i].children[5].children[1].value;
             }
         }
-        let unitValue;
-        // convertes the values of lbs and kgs to 0 or 1. 
-        if(inputUnit == "lbs"){
-            unitValue = 0
-        }else if (inputUnit == "kgs"){
-            unitValue = 1
-        }
         let req = new XMLHttpRequest();
-        let payload = {id:null, name:null, reps:null, weight:null, unit:null, date:null}; 
-        payload.id = rowId;
-        payload.name = inputName;
-        payload.reps = inputReps;
-        payload.weight = inputWeight;
-        payload.unit = unitValue;
-        payload.date = inputDate;
+        let payload = { auth_first_name:null, auth_mid_name:null, auth_last_name:null, auth_id:null}; 
+        payload.auth_id = rowId;
+        payload.auth_first_name = inputFname;
+        payload.auth_mid_name = inputMname;
+        payload.auth_last_name = inputLname;
         req.open('PUT', baseUrl, true);
         req.setRequestHeader('Content-Type', 'application/json');
         req.addEventListener('load',function(){
             if(req.status >= 200 && req.status < 400){
                 let response = JSON.parse(req.responseText);
-                getData();
+                displayNewData();
             } else {
                 console.log("Error in network request: " + req.statusText);
             }});
-        req.send(JSON.stringify(payload));  
+        if(payload.auth_first_name !== "" && payload.auth_last_name !== "") {
+            req.send(JSON.stringify(payload));
+        } else {
+            displayNewData();
+        }
 };
 
 // creates delete button and if clicked, deletes selected row(data) from the database. 
@@ -178,14 +173,14 @@ const deleteButton = (row, rowData,) => {
     delButton.addEventListener("click", function(event){
         console.log("YOU pressed delete button and row id:", rowData["book_id"]);
         let req = new XMLHttpRequest();
-        let payload = {id:null}; // creates an object
-        payload.id = rowData["book_id"];
+        let payload = {auth_id:null}; // creates an object
+        payload.auth_id = rowData["auth_id"];
         req.open('DELETE', baseUrl, true);
         req.setRequestHeader('Content-Type', 'application/json');
         req.addEventListener('load',function(){
             if(req.status >= 200 && req.status < 400){
                 let response = JSON.parse(req.responseText);;
-                getData();
+                displayNewData();
             } else {
                 console.log("Error in network request: " + req.statusText);
             }});
@@ -258,6 +253,23 @@ function getData(){
 });
 }  
 
+// displays updated data when called. Called in deleteButton function. 
+const displayNewData = () => {
+    var req = new XMLHttpRequest();
+    req.open('GET', baseUrl, true);
+    req.send(null);
+    req.addEventListener('load',function(){
+        if(req.status >= 200 && req.status < 400){
+            let response = JSON.parse(req.responseText);
+            data = JSON.parse(response.results)
+            makeTable(data); 
+        } else {
+            console.log("Error in network request: " + req.statusText);
+          }
+    });
+}
+
+
 // POST request
 document.getElementById('addAuthor').addEventListener('click', function(event){
     let req = new XMLHttpRequest();
@@ -270,7 +282,7 @@ document.getElementById('addAuthor').addEventListener('click', function(event){
     req.addEventListener('load',function(){
       if(req.status >= 200 && req.status < 400){
         let response = JSON.parse(req.responseText);
-        getData();
+        displayNewData();
       } else {
         console.log("Error in network request: " + req.statusText);
       }});

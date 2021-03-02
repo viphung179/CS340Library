@@ -1,6 +1,7 @@
 const baseUrl = `http://flip3.engr.oregonstate.edu:3103/books`
 
 
+
 // deletes table children elements.
 const deleteTable = () => { 
     let parent =  document.getElementById("workoutsTable")
@@ -125,42 +126,39 @@ const doneUpdate = (rowData, table) => {
         let rowId = rowData["book_id"]
         console.log("id: ", rowId)
         let numElement = table.childElementCount
-        let inputName, inputReps, inputWeight, inputUnit, inputDate;
+        let inputTitle, inputISBN, inputAuthId, inputYear, inputCopiesAvailable;
         for(let i=1; i< numElement; i++ ){
             parent = table.children[i].children[0].children[1].value;
             if (rowId == parent){
-                    inputName = table.children[i].children[1].children[1].value;
-                    inputReps = table.children[i].children[2].children[1].value;
-                    inputWeight = table.children[i].children[3].children[1].value;
-                    inputUnit = table.children[i].children[4].children[1].value;
-                    inputDate = table.children[i].children[5].children[1].value;
+                    inputTitle = table.children[i].children[1].children[1].value;
+                    inputISBN = table.children[i].children[2].children[1].value;
+                    inputAuthId = table.children[i].children[3].children[1].value;
+                    inputYear = table.children[i].children[4].children[1].value;
+                    inputCopiesAvailable = table.children[i].children[5].children[1].value;
             }
         }
-        let unitValue;
-        // convertes the values of lbs and kgs to 0 or 1. 
-        if(inputUnit == "lbs"){
-            unitValue = 0
-        }else if (inputUnit == "kgs"){
-            unitValue = 1
-        }
         let req = new XMLHttpRequest();
-        let payload = {id:null, name:null, reps:null, weight:null, unit:null, date:null}; 
-        payload.id = rowId;
-        payload.name = inputName;
-        payload.reps = inputReps;
-        payload.weight = inputWeight;
-        payload.unit = unitValue;
-        payload.date = inputDate;
+        let payload = {isbn:null, title:null, auth_id:null, year:null, copies_available:null, book_id:null}; 
+        payload.isbn = inputISBN;
+        payload.title = inputTitle;
+        payload.auth_id = inputAuthId;
+        payload.year = inputYear;
+        payload.copies_available = inputCopiesAvailable;
+        payload.book_id = rowId;
         req.open('PUT', baseUrl, true);
         req.setRequestHeader('Content-Type', 'application/json');
         req.addEventListener('load',function(){
             if(req.status >= 200 && req.status < 400){
                 let response = JSON.parse(req.responseText);
-                getData();
+                //getData();
             } else {
                 console.log("Error in network request: " + req.statusText);
             }});
-        req.send(JSON.stringify(payload));  
+        if(payload.isbn !== "" && payload.title !== "" && payload.auth_id !== "" && payload.year !== "" && payload.year !== "" && payload.copies_available !== "") {
+            req.send(JSON.stringify(payload));
+        }else{
+            displayNewData();
+        }
 };
 
 // creates delete button and if clicked, deletes selected row(data) from the database. 
@@ -170,21 +168,20 @@ const deleteButton = (row, rowData,) => {
     delButton.classList.add("btn","btn-info")
     delButton.textContent = "Delete";
     delButton.class = "deleteButton"
-    
     bCell.appendChild(delButton);
     row.appendChild(bCell)
     //row.appendChild(delButton);   
     delButton.addEventListener("click", function(event){
         console.log("You pressed delete button and row id:", rowData["book_id"]);
         let req = new XMLHttpRequest();
-        let payload = {id:null}; // creates an object
-        payload.id = rowData["book_id"];
+        let payload = {book_id:null}; // creates an object
+        payload.book_id = rowData["book_id"];
         req.open('DELETE', baseUrl, true);
         req.setRequestHeader('Content-Type', 'application/json');
         req.addEventListener('load',function(){
             if(req.status >= 200 && req.status < 400){
                 let response = JSON.parse(req.responseText);;
-                getData();
+                displayNewData();
             } else {
                 console.log("Error in network request: " + req.statusText);
             }});
@@ -223,7 +220,9 @@ const disableRow = (rowId, table) => {
     }
 };
 
-// Gets/requests database data. 
+
+
+// When search button is selected, specified data is retrieved from database.
 document.addEventListener('DOMContentLoaded', getData);
 function getData(){
     document.getElementById('searchBook').addEventListener('click', function(event){
@@ -267,6 +266,47 @@ function getData(){
 });
 }  
 
+// displays updated data when called. Called in Delete Button function. 
+const displayNewData = () => {
+    var req = new XMLHttpRequest();
+    req.open('GET', baseUrl, true);
+    req.send(null);
+    req.addEventListener('load',function(){
+        if(req.status >= 200 && req.status < 400){
+            let response = JSON.parse(req.responseText);
+            data = JSON.parse(response.results)
+            makeTable(data); 
+        } else {
+            console.log("Error in network request: " + req.statusText);
+          }
+    });
+}
+
+// populating drop down menu for author ID for  add book
+document.getElementById('dropDownMenu').addEventListener('click', function(event){
+    var req = new XMLHttpRequest();
+    var menu = document.getElementById('dropDownMenu')
+    req.open('GET', 'http://flip3.engr.oregonstate.edu:3103/authors', true);
+    req.send(null);
+    req.addEventListener('load',function(){
+        if(req.status >= 200 && req.status < 400){
+            let response = JSON.parse(req.responseText);
+            data = JSON.parse(response.results)
+            for(let i=0; i<data.length; i++ ) {
+                menuItem = document.createElement('option');
+                menuItem.type = 'number';
+                menuItem.value = data[i]['auth_id'] ;
+                console.log(data[i]['auth_id'])
+                menu.appendChild(menuItem);
+            }
+
+        } else {
+            console.log("Error in network request: " + req.statusText);
+          }
+    });
+    event.preventDefault();
+})
+
 // submits new input data(row) from the user to the database. 
 document.getElementById('addBook').addEventListener('click', function(event){
     let req = new XMLHttpRequest();
@@ -281,7 +321,7 @@ document.getElementById('addBook').addEventListener('click', function(event){
     req.addEventListener('load',function(){
       if(req.status >= 200 && req.status < 400){
         let response = JSON.parse(req.responseText);
-        getData();
+        displayNewData();
       } else {
         console.log("Error in network request: " + req.statusText);
       }});

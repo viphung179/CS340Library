@@ -3,7 +3,7 @@ var mysql = require('./dbcon.js');
 var CORS = require('cors')
 
 var app = express();
-app.set('port', 5249);
+app.set('port', 3103);
 app.use(express.json())
 app.use(express.urlencoded({extended: false}))
 app.use(CORS());
@@ -22,6 +22,8 @@ const getTitleLastName = 'SELECT * FROM books JOIN authors ON books.auth_id = au
 const getTitleLastNameYear = 'SELECT * FROM books JOIN authors ON books.auth_id = authors.auth_id WHERE title=? AND authors.auth_last_name = ? AND year=?';
 const getTitleYear = 'SELECT * FROM books JOIN authors ON books.auth_id = authors.auth_id WHERE title=? AND year=?';
 const getLastNameYear = 'SELECT * FROM books JOIN authors ON books.auth_id = authors.auth_id WHERE authors.auth_last_name = ? AND year=?';
+const updateBooks = 'UPDATE `books` SET isbn=?, title=?, auth_id=?, year=?, copies_available=? WHERE book_id =?';
+const deleteBooks = 'DELETE FROM books WHERE book_id=?'
 
 // Authors page queries
 const getAllQueryAuth = 'SELECT * FROM authors';
@@ -30,7 +32,8 @@ const getAuthorID = "SELECT * FROM authors WHERE auth_id =?";
 const getAuthorFirstName = "SELECT * FROM authors WHERE auth_first_name=?";
 const getAuthorLastName = "SELECT * FROM authors WHERE auth_last_name=?";
 const getAuthorFirstLastName = "SELECT * FROM authors  WHERE auth_first_name =? AND auth_last_name =?";
-
+const updateAuthors = 'UPDATE authors SET auth_first_name=?, auth_mid_name=?, auth_last_name=? WHERE auth_id=?';
+const deleteAuthors= 'DELETE FROM authors WHERE auth_id=?'
 
 // Members page queries
 const getAllMembers = 'SELECT * FROM members' ;
@@ -442,10 +445,10 @@ app.post('/memberAccountres',function(req,res,next){
 });
 
 
-// deletes table-row in database.
-app.delete('/',function(req,res,next){
-  var {id} = req.body;
-  mysql.pool.query(deleteQuery, [id], function(err, result){
+// deletes BOOKS instance.
+app.delete('/books',function(req,res,next){
+  var {book_id} = req.body;
+  mysql.pool.query(deleteBooks, [book_id], function(err, result){
     if(err){
       next(err);
       return;
@@ -454,11 +457,24 @@ app.delete('/',function(req,res,next){
   });
 });
 
-// updates database.
-app.put('/',function(req,res,next){
+// deletes AUTHORS instance.
+app.delete('/authors',function(req,res,next){
+  var {auth_id} = req.body;
+  mysql.pool.query(deleteAuthors, [auth_id], function(err, result){
+    if(err){
+      next(err);
+      return;
+    }
+    getAllData(res);
+  });
+});
+
+// updates BOOKS table.
+app.put('/books',function(req,res,next){
   var context = {};
-  var {name, reps, weight, unit, date, id} = req.body
-  mysql.pool.query(updateQuery,[name, reps, weight, unit, date, id], function(err, result){
+  var {isbn, title, auth_id, year, copies_available, book_id} = req.body
+  console.log(req.body)
+  mysql.pool.query(updateBooks,[isbn, title, auth_id, year, copies_available, book_id], function(err, result){
     if(err){
       next(err);
       return;
@@ -467,6 +483,18 @@ app.put('/',function(req,res,next){
   });
 });
 
+// updates AUTHORS table.
+app.put('/authors',function(req,res,next){
+  var context = {};
+  var {auth_first_name, auth_mid_name, auth_last_name, auth_id} = req.body
+  mysql.pool.query(updateAuthors,[auth_first_name, auth_mid_name, auth_last_name, auth_id], function(err, result){
+    if(err){
+      next(err);
+      return;
+    }
+    getAllData(res);
+  });
+});
 
 app.use(function(req,res){
   res.status(404);
