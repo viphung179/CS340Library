@@ -1,4 +1,4 @@
-const baseUrl = `http://flip3.engr.oregonstate.edu:5249/memberAccount`;
+const baseUrl = `http://flip3.engr.oregonstate.edu:5149/memberAccount`;
 // console.log(localStorage['mem_id']);
 // console.log(localStorage['mem_fname']);
 let currMemId = localStorage['mem_id'];
@@ -26,6 +26,7 @@ document.addEventListener('DOMContentLoaded', getdata);
 
 document.getElementById('loanBook').addEventListener('click', function(event){
     let req = new XMLHttpRequest();
+    let books= document.getElementById('books').textContent
     let info = {book_id: null, mem_id: currMemId};
     info.book_id = document.getElementById('bookID').value;
     req.open('POST', baseUrl, true);
@@ -33,7 +34,10 @@ document.getElementById('loanBook').addEventListener('click', function(event){
     req.addEventListener('load',function(){
       if(req.status >= 200 && req.status < 400){
         let response = JSON.parse(req.responseText);
+        // alert("helloooo")
+        // console.log(response);
         deleteTable()
+        makeBooksCheckedOut(response["loans"])
         if (response["loans"].length != 0){
           makeTable(response["loans"]);
         }
@@ -45,8 +49,10 @@ document.getElementById('loanBook').addEventListener('click', function(event){
         console.log("Error in network request: " + req.statusText);
       }});
     
-     if(info.mem_first_name !== "" && info.mem_last_name !== "" && info.mem_email !== "" && info.mem_zip_code !== "" ) {
+     if(info.book_id !== ' ' && books < 5 ) {
         req.send(JSON.stringify(info));
+     } else {
+       alert("The max amount of active books loans have been reached.")
      }
 
     event.preventDefault();
@@ -86,8 +92,13 @@ function getdata() {
   req.addEventListener('load',function(){
       if (req.status >= 200 && req.status < 400){
         let response = JSON.parse(req.responseText);
-        // console.log(typeof response)
+        // call function to calc books checked out
+        makeBooksCheckedOut(response["loans"])
+        // getBooksCheckedOut(response["loans"])
+        console.log(response["loans"])
+        // console.log(response["loans"].length)
         if (response["loans"].length != 0){
+          // console.log(response["loans"].length)
           makeTable(response["loans"]);
         }
 
@@ -99,6 +110,34 @@ function getdata() {
       }
   })
   req.send(null);
+}
+
+function getBooksCheckedOut(loans) {
+  let booksCheckedOut = 0
+  if (loans.length === 0) {
+    return booksCheckedOut
+  }
+  for (let i = 0; i < loans.length; i++) {
+    // console.log(loans[i].loan_due_date)
+    let dueDate = new Date(loans[i].loan_due_date)
+    let newDate = new Date();
+    let diffTime = Math.abs(newDate - dueDate)
+    let difference = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    if (difference > 0){
+      booksCheckedOut += 1
+    }
+
+    // console.log(typeof loans[i].loan_due_date)
+  }
+  return booksCheckedOut
+}
+
+function makeBooksCheckedOut(rows){
+  let userBooks = document.createElement('h4');
+  userBooks.textContent = 'Books Checked Out: ' + getBooksCheckedOut(rows);
+  userBooks.id = 'books'
+  userBooks.classList.add('lead', 'pl-3');
+  document.body.appendChild(userBooks);
 }
 
 function makeTable(rows) {
@@ -151,16 +190,16 @@ function makeRow(rows, newTable){
   newTable.appendChild(body);
   for (let i = 0; i < rows.length; i++) {
     let newRow = document.createElement("tr");
-    newRow.appendChild(createTD("number", rows[i].loans_id, "loanId" + rows[i].id, true));
-    newRow.appendChild(createTD("text", rows[i].title, "title" + rows[i].id));
-    newRow.appendChild(createTD("text", rows[i].auth_first_name + " " + rows[i].auth_last_name, "authName" + rows[i].id));
+    newRow.appendChild(createTD("number", rows[i].loans_id, "loanId" + rows[i].loan_id, true));
+    newRow.appendChild(createTD("text", rows[i].title, "title" + rows[i].loan_id));
+    newRow.appendChild(createTD("text", rows[i].auth_first_name + " " + rows[i].auth_last_name, "authName" + rows[i].loan_id));
     // newRow.appendChild(createTD("text", rows[i].mem_last_name, "lastName" + rows[i].id));
     // newRow.appendChild(createTD("email", rows[i].mem_email, "email"+ rows[i].id));
     // newRow.appendChild(createTD("text", rows[i].mem_zip_code, "zipCode"+ rows[i].id));
     // newRow.appendChild(createTD("number", rows[i].books_checked_out, "books"+ rows[i].id));
     // newRow.appendChild(radioInputs(rows[i].unit,rows[i].id));
-    newRow.appendChild(createTD("date", rows[i].loan_date.slice(0,10), "loanDate"+ rows[i].id));
-    newRow.appendChild(createTD("date", rows[i].loan_due_date.slice(0,10), "dueDate"+ rows[i].id));
+    newRow.appendChild(createTD("date", rows[i].loan_date.slice(0,10), "loanDate"+ rows[i].loan_id));
+    newRow.appendChild(createTD("date", rows[i].loan_due_date.slice(0,10), "dueDate"+ rows[i].loan_id));
     let updateCell = document.createElement("td");
     let updateButton = document.createElement("button");
     updateButton.textContent = "Update";
@@ -235,7 +274,7 @@ function makeResRow(rows, newTable){
     } else {
       rowStatus = "Active"
     }
-    console.log(rowStatus)
+    // console.log(rowStatus)
     newRow.appendChild(createTD("text", rowStatus, "resStatus" + rows[i].id));
     let updateCell = document.createElement("td");
     let updateButton = document.createElement("button");
@@ -364,11 +403,15 @@ function createTD(type, value, id, isID = false) {
 function deleteTable(){
   let loantable = document.getElementById('loanTable');
   let loanheading = document.getElementById('loanHeader');
+  let booksCount = document.getElementById('books')
   let restable = document.getElementById('resTable');
   let resheading = document.getElementById('resHeader');
+  
   if (loantable !== null) {
     loantable.parentNode.removeChild(loantable);
     loanheading.parentNode.removeChild(loanheading);
+    booksCount.parentNode.removeChild(booksCount);
+    
   }
 
   if (restable !== null) {

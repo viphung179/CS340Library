@@ -1,4 +1,4 @@
-const baseUrl = `http://flip3.engr.oregonstate.edu:5249/members`;
+const baseUrl = `http://flip3.engr.oregonstate.edu:5149/members`;
 
 document.addEventListener('DOMContentLoaded', getdata);
 
@@ -117,7 +117,7 @@ function makeTable(rows) {
 function makeHeaders(newTable) {
   let header = document.createElement("thead");
   newTable.appendChild(header);
-  let headerName = ['id','First Name', 'Middle Name', 'Last Name', 'Email', 'Zip Code', 'Books Checked Out'];
+  let headerName = ['id','First Name', 'Middle Name', 'Last Name', 'Email', 'Zip Code'];
     for (let c = 0; c < headerName.length; c++){
         let newHeader = document.createElement("th");
         newHeader.textContent = headerName[c];
@@ -141,7 +141,7 @@ function makeRow(rows, newTable){
     newRow.appendChild(createTD("text", rows[i].mem_last_name, "lastName" + rows[i].mem_id));
     newRow.appendChild(createTD("email", rows[i].mem_email, "email"+ rows[i].mem_id));
     newRow.appendChild(createTD("text", rows[i].mem_zip_code, "zipCode"+ rows[i].mem_id));
-    newRow.appendChild(createTD("number", rows[i].books_checked_out, "books"+ rows[i].mem_id));
+    // newRow.appendChild(createTD("number", rows[i].books_checked_out, "books"+ rows[i].mem_id));
     // newRow.appendChild(radioInputs(rows[i].unit,rows[i].id));
     // newRow.appendChild(createTD("date", rows[i].date.slice(0,10), "newDate"+ rows[i].id));
     let updateCell = document.createElement("td");

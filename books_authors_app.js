@@ -64,6 +64,7 @@ const insertBookResQuery = `INSERT INTO book_reservation (res_id, book_id)
                             VALUES (?,?);`
 const insertResQuery = `INSERT INTO reservations (mem_id, res_date, res_active)
                         VALUES (?, ?, ?);`
+const countLoansQuery = `SELECT COUNT(*) FROM loans WHERE mem_id = ?;`
 
 // sends the entire table/data back to the client
 const getAllData = (res) => {
@@ -128,9 +129,16 @@ const getMemLoans = (req, res) => {
       next(err);
       return;
     }
-    memLoanRes.loans = rows
-    // console.log(memLoanRes.loans)
-    getMemRes(req,res)
+
+    mysql.pool.query(countLoansQuery, req, (err, loanCount, fields) => {
+      if (err) {
+        console.log('count error')
+        next(err);
+        return;
+      }
+      memLoanRes.loans = rows
+      getMemRes(req,res)
+    })
   })
 }
 
@@ -387,17 +395,50 @@ mysql.pool.query(deleteMemQuery, mem_id, (err, result) => {
 });
 
 // GET LOAN and RESERVATIONS
+// GET LOAN and RESERVATIONS
 app.get('/memberAccount',function(req,res,next){
   let mem_id = req.query.mem_id;
   getMemLoans(req.query.mem_id,res);
 });
 
 
+// from https://stackoverflow.com/questions/563406/add-days-to-javascript-date
+function addDays(date, days) {
+  var result = new Date(date);
+  result.setDate(result.getDate() + days);
+  return result;
+}
+
+
+//https://stackoverflow.com/questions/49330139/date-toisostring-but-local-time-instead-of-utc
+function toISOLocal(d) {
+  var z  = n =>  ('0' + n).slice(-2);
+  var zz = n => ('00' + n).slice(-3);
+  var off = d.getTimezoneOffset();
+  var sign = off < 0? '+' : '-';
+  off = Math.abs(off);
+
+  return d.getFullYear() + '-'
+         + z(d.getMonth()+1) + '-' +
+         z(d.getDate()) + 'T' +
+         z(d.getHours()) + ':'  + 
+         z(d.getMinutes()) + ':' +
+         z(d.getSeconds()) + '.' +
+         zz(d.getMilliseconds()) +
+         sign + z(off/60|0) + ':' + z(off%60); 
+}
+
 // POST LOAN
 app.post('/memberAccount',function(req,res,next){
   var {book_id, mem_id, loan_id} = req.body;
-  var loan_date = new Date().toISOString().slice(0, 19).replace('T', ' ');
-  var loan_due_date = loan_date;
+  var newDate = new Date()
+  var loan_date = toISOLocal(newDate).slice(0,19).replace('T', ' ')
+  // var loan_date = new Date().toISOString().slice(0, 19).replace('T', ' ');
+  var loan_due_date = toISOLocal(addDays(newDate, 90)).slice(0,19).replace('T', ' ');
+  // console.log(loan_due_date)
+  // console.log(toISOLocal(loan_due_date))
+  // loan_due_date = addDays(loan_due_date, 90)
+  // loan_due_date = loan_due_date.toISOString().slice(0, 19).replace('T', ' ')
   mysql.pool.query(insertLoanQuery, [mem_id, loan_date, loan_due_date, loan_id], (err, result) => {
     if(err){
       next(err);
