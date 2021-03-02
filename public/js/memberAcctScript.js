@@ -22,31 +22,35 @@ booksDes.textContent = 'Books Checked Out: ';
 booksDes.classList.add('lead', 'pl-3');
 document.body.appendChild(booksDes)
 
+let currLoans = null;
+
 // let userBooks = document.createElement('h4');
 // userBooks.textContent = 'Books Checked Out: ' + currBooks;
 // userBooks.classList.add('lead', 'pl-3');
 // document.body.appendChild(userBooks);
 
 document.addEventListener('DOMContentLoaded', getdata);
-
 document.getElementById('loanBook').addEventListener('click', function(event){
     let req = new XMLHttpRequest();
     let books= document.getElementById('books').textContent
     let info = {book_id: null, mem_id: currMemId};
     info.book_id = document.getElementById('bookID').value;
+    // console.log(isDups(currLoans, info.book_id));
+
     req.open('POST', baseUrl, true);
     req.setRequestHeader('Content-Type', 'application/json');
+    
     req.addEventListener('load',function(){
       if(req.status >= 200 && req.status < 400){
         let response = JSON.parse(req.responseText);
         // alert("helloooo")
         // console.log(response);
         deleteTable()
+        currLoans = response["loans"]
         makeBooksCheckedOut(response["loans"])
         if (response["loans"].length != 0){
           makeTable(response["loans"]);
         }
-
         // if (response["reserv"].length != 0){
         //   makeResTable(response["reserv"]);
         // }
@@ -54,7 +58,7 @@ document.getElementById('loanBook').addEventListener('click', function(event){
         console.log("Error in network request: " + req.statusText);
       }});
     
-     if(info.book_id !== '' && books < 5 ) {
+     if(info.book_id !== '' && books < 5 && isDups(currLoans, info.book_id) === false) {
         req.send(JSON.stringify(info));
      } else {
        alert("The max amount of active books loans have been reached.")
@@ -98,8 +102,10 @@ function getdata() {
       if (req.status >= 200 && req.status < 400){
         let response = JSON.parse(req.responseText);
         // call function to calc books checked out
+        currLoans = response["loans"];
+        console.log(currLoans)
         makeBooksCheckedOut(response["loans"])
-        console.log(response["loans"])
+        // console.log(response["loans"])
         if (response["loans"].length != 0){
           makeTable(response["loans"]);
         }
@@ -112,6 +118,7 @@ function getdata() {
       }
   })
   req.send(null);
+  
 }
 
 function getBooksCheckedOut(loans) {
@@ -311,18 +318,21 @@ function updateRow(button, id) {
   let currentRow = button.parentNode.parentNode
   let inputs = currentRow.getElementsByTagName("input");
   for (let i = 0; i < inputs.length; i++) {
+    if (inputs[i].type == 'date'){
     inputs[i].disabled = false;
+  }
   }
   button.textContent = "Done";
 
   button.addEventListener('click', function(){
     let req = new XMLHttpRequest();
     let info = {loan_id: null, loan_due_date: null, mem_id: null };
+    let loan_date = new Date(document.getElementById('loanDate'+ id).value)
     console.log(id)
     info.loan_id = document.getElementById('loanId' + id).textContent;
     info.loan_due_date = document.getElementById('newDueDate'+ id).value;
     info.loan_due_date = new Date(info.loan_due_date)
-    console.log(info.loan_due_date)
+    let diffDays = daysDiff(loan_date, info.loan_due_date)
     info.mem_id = currMemId;
     // info.weight = document.getElementById('newWeight'+ id).value;
     // if( document.getElementById('newKg' + id).checked){
@@ -346,13 +356,35 @@ function updateRow(button, id) {
         console.log("Error in network request: " + req.statusText);
       }});
     
-    if(info.name !== "" && info.reps !== "" && info.weight !== "" && info.unit !== "" && info.date !== "") {
+    if(diffDays >= 0 && diffDays <= 90) {
         req.send(JSON.stringify(info));
     } else {
-      alert("Please enter all fields")
+      alert("Please select valid dates")
     }
   })
   
+}
+
+function isDups(membersLoans, book_id){
+  console.log(membersLoans)
+  for (let i = 0; i < membersLoans.length; i++) {
+    console.log(membersLoans[i].book_id)
+    console.log(book_id)
+    if (membersLoans[i].book_id == book_id) {
+      return true
+    }
+  }
+  return false
+}
+
+//https://stackoverflow.com/questions/3224834/get-difference-between-2-dates-in-javascript
+function daysDiff(loan_date, loan_due_date) {
+  const date1 = new Date(loan_date);
+  const date2 = new Date(loan_due_date);
+  const diffTime = (date2 - date1);
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+  console.log(diffDays + " days");
+  return diffDays
 }
 
 function createTD(type, value, id, isID = false) {
