@@ -39,6 +39,7 @@ const deleteAuthors= 'DELETE FROM authors WHERE auth_id=?'
 const getAllMembers = 'SELECT * FROM members' ;
 const insertMemberQuery = "INSERT INTO members (`mem_first_name`, `mem_mid_name`, `mem_last_name`, `mem_email`, `mem_zip_code`, `books_checked_out`) VALUES (?, ?, ?, ?, ?,?)";
 const deleteMemQuery = "DELETE FROM members WHERE mem_id=?";
+const updateMembers = 'UPDATE members SET mem_first_name=?, mem_mid_name=?, mem_last_name=?, mem_email=?, mem_zip_code=? WHERE mem_id=?'
 
 
 // Member Account page queries
@@ -371,8 +372,8 @@ app.get('/members',function(req,res,next){
 
 // POST MEMBERS
 app.post('/members',function(req,res,next){
-var {mem_first_name, mem_mid_name, mem_last_name, mem_email, mem_zip_code, books_checked_out, mem_id} = req.body;
-mysql.pool.query(insertMemberQuery, [mem_first_name, mem_mid_name, mem_last_name, mem_email, mem_zip_code, books_checked_out, mem_id], (err, result) => {
+var {mem_first_name, mem_mid_name, mem_last_name, mem_email, mem_zip_code, mem_id} = req.body;
+mysql.pool.query(insertMemberQuery, [mem_first_name, mem_mid_name, mem_last_name, mem_email, mem_zip_code, mem_id], (err, result) => {
   if(err){
     next(err);
     return;
@@ -510,11 +511,24 @@ app.delete('/authors',function(req,res,next){
   });
 });
 
-// updates BOOKS table.
+// updates Members instance.
+app.put('/members',function(req,res,next){
+  var context = {};
+  var {mem_first_name, mem_mid_name, mem_last_name, mem_email, mem_zip_code, mem_id} = req.body
+  console.log(req.body)
+  mysql.pool.query(updateMembers,[mem_first_name, mem_mid_name, mem_last_name, mem_email, mem_zip_code, mem_id], function(err, result){
+    if(err){
+      next(err);
+      return;
+    }
+    getAllData(res);
+  });
+});
+
+// updates BOOKS instance.
 app.put('/books',function(req,res,next){
   var context = {};
   var {isbn, title, auth_id, year, copies_available, book_id} = req.body
-  console.log(req.body)
   mysql.pool.query(updateBooks,[isbn, title, auth_id, year, copies_available, book_id], function(err, result){
     if(err){
       next(err);
@@ -524,7 +538,7 @@ app.put('/books',function(req,res,next){
   });
 });
 
-// updates AUTHORS table.
+// updates AUTHORS instance.
 app.put('/authors',function(req,res,next){
   var context = {};
   var {auth_first_name, auth_mid_name, auth_last_name, auth_id} = req.body
@@ -536,6 +550,8 @@ app.put('/authors',function(req,res,next){
     getAllData(res);
   });
 });
+
+
 
 app.use(function(req,res){
   res.status(404);

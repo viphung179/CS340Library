@@ -1,4 +1,4 @@
-const baseUrl = `http://flip3.engr.oregonstate.edu:5149/members`;
+const baseUrl = `http://flip3.engr.oregonstate.edu:3103/members`;
 
 document.addEventListener('DOMContentLoaded', getdata);
 
@@ -100,7 +100,9 @@ function makeTable(rows) {
     if (target.tagName != 'BUTTON') return;
     if (target.textContent == "Delete"){
       deleteRow(targetId);
-    } else if (target.textContent == "Update") {
+      // Note: (added target.textContent == "Done") just so when Done button was pressed
+      // it would not be directed to the else condition. 
+    } else if (target.textContent == "Update" || target.textContent == "Done"){
       updateRow(target, targetId);
     } else {
       let member = {'mem_id': targetId, 'mem_fname': memFname}
@@ -193,20 +195,15 @@ function updateRow(button, id) {
     inputs[i].disabled = false;
   }
   button.textContent = "Done";
-
   button.addEventListener('click', function(){
     let req = new XMLHttpRequest();
-    let info = {name: null, reps: null, weight: null, unit: null, date: null, id:null};
-    info.name = document.getElementById('newName' + id).value;
-    info.reps = document.getElementById('newReps'+ id).value;
-    info.weight = document.getElementById('newWeight'+ id).value;
-    if( document.getElementById('newKg' + id).checked){
-        info.unit = 1;
-    } else if ( document.getElementById('newLbs' + id).checked){
-        info.unit = 0;
-    }
-    info.date = document.getElementById('newDate'+ id).value;
-    info.id = id;
+    let info = {mem_first_name: null, mem_mid_name: null, mem_last_name: null, mem_email: null, mem_zip_code: null, mem_id:null};
+    info.mem_first_name = document.getElementById('firstName' + id).value;
+    info.mem_mid_name = document.getElementById('midName'+ id).value;
+    info.mem_last_name = document.getElementById('lastName'+ id).value;
+    info.mem_email = document.getElementById('email' + id).value;
+    info.mem_zip_code = document.getElementById('zipCode'+ id).value;
+    info.mem_id = id;
     req.open('PUT', baseUrl, true);
     req.setRequestHeader('Content-Type', 'application/json');
     req.addEventListener('load',function(){
@@ -220,13 +217,13 @@ function updateRow(button, id) {
         console.log("Error in network request: " + req.statusText);
       }});
     
-    if(info.name !== "" && info.reps !== "" && info.weight !== "" && info.unit !== "" && info.date !== "") {
+    if(info.mem_first_name !== ""  && info.mem_last_name !== "" && info.mem_email !== "" && info.mem_zip_code !== "" ) {
         req.send(JSON.stringify(info));
     } else {
       alert("Please enter all fields")
     }
   })
-  
+
 }
 
 function createTD(type, value, id, isID = false) {
@@ -259,12 +256,12 @@ function createTD(type, value, id, isID = false) {
 //   let radios = document.createElement("span");
 //   let kgRadio = document.createElement("INPUT");
 //   let kgText = document.createTextNode("Kg");
-//   kgRadio.name = id;
+//   kgRadio.mem_first_name = id;
 //   kgRadio.type = "radio";
 //   kgRadio.id = "newKg" + id;
 //   let lbsRadio = document.createElement("INPUT");
 //   let lbsText = document.createTextNode("Lbs");
-//   lbsRadio.name = id;
+//   lbsRadio.mem_first_name = id;
 //   lbsRadio.type = "radio";
 //   lbsRadio.id = "newLbs" + id;
 //   if (value === 0) {

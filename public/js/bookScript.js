@@ -221,7 +221,6 @@ const disableRow = (rowId, table) => {
 };
 
 
-
 // When search button is selected, specified data is retrieved from database.
 document.addEventListener('DOMContentLoaded', getData);
 function getData(){
@@ -282,7 +281,7 @@ const displayNewData = () => {
     });
 }
 
-// populating drop down menu for author ID for  add book
+// populating drop down menu for author ID for add book
 document.getElementById('dropDownMenu').addEventListener('click', function(event){
     var req = new XMLHttpRequest();
     var menu = document.getElementById('dropDownMenu')
