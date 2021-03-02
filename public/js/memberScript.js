@@ -1,4 +1,4 @@
-const baseUrl = `http://flip3.engr.oregonstate.edu:3103/members`;
+const baseUrl = `http://flip3.engr.oregonstate.edu:5149/members`;
 
 document.addEventListener('DOMContentLoaded', getdata);
 
@@ -94,9 +94,10 @@ function makeTable(rows) {
     let targetRow = target.parentNode.parentNode
     let targetId = targetRow.firstElementChild.textContent;
     let memFname = targetRow.firstElementChild.nextElementSibling;
+    // console.log(memFname.textContent)
     let memLname = memFname.nextElementSibling.nextElementSibling;
     let booksChecked = memLname.nextElementSibling.nextElementSibling.nextElementSibling;
-    console.log(memFname)
+    // console.log(memFname)
     if (target.tagName != 'BUTTON') return;
     if (target.textContent == "Delete"){
       deleteRow(targetId);
@@ -209,6 +210,7 @@ function updateRow(button, id) {
     req.addEventListener('load',function(){
       if(req.status >= 200 && req.status < 400){
         let response = JSON.parse(req.responseText);
+        console.log(response)
         deleteTable();
         if (response["rows"].length != 0){
           makeTable(response["rows"]);

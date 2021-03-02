@@ -397,7 +397,6 @@ mysql.pool.query(deleteMemQuery, mem_id, (err, result) => {
 });
 
 // GET LOAN and RESERVATIONS
-// GET LOAN and RESERVATIONS
 app.get('/memberAccount',function(req,res,next){
   let mem_id = req.query.mem_id;
   getMemLoans(req.query.mem_id,res);
@@ -532,7 +531,6 @@ app.delete('/authors',function(req,res,next){
 
 // updates Members instance.
 app.put('/members',function(req,res,next){
-  var context = {};
   var {mem_first_name, mem_mid_name, mem_last_name, mem_email, mem_zip_code, mem_id} = req.body
   console.log(req.body)
   mysql.pool.query(updateMembers,[mem_first_name, mem_mid_name, mem_last_name, mem_email, mem_zip_code, mem_id], function(err, result){
@@ -540,7 +538,7 @@ app.put('/members',function(req,res,next){
       next(err);
       return;
     }
-    getAllData(res);
+    getMemAllData(res);
   });
 });
 
