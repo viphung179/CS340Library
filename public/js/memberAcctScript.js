@@ -380,6 +380,7 @@ function deleteRow(rowID) {
   req.addEventListener('load',function(){
     if(req.status >= 200 && req.status < 400){
       let response = JSON.parse(req.responseText);
+      currLoans = response["loans"]
       deleteTable();
       makeBooksCheckedOut(response["loans"])
       if (response["loans"].length != 0){
