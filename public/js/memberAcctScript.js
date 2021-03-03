@@ -109,7 +109,7 @@ function getdata() {
         let response = JSON.parse(req.responseText);
         // call function to calc books checked out
         currLoans = response["loans"];
-        console.log(currLoans)
+        // console.log(currLoans)
         makeBooksCheckedOut(response["loans"])
         // console.log(response["loans"])
         if (response["loans"].length != 0){
@@ -129,7 +129,7 @@ function getdata() {
 
 function getBooksCheckedOut(loans) {
   let booksCheckedOut = 0
-  console.log(loans)
+  // console.log(loans)
   if (loans.length == 0) {
     return booksCheckedOut
   }
@@ -139,7 +139,7 @@ function getBooksCheckedOut(loans) {
     let newDate = new Date();
     let diffTime = (dueDate - newDate)
     let difference = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    console.log(difference)
+    // console.log(difference)
     if (difference >= 0){
       booksCheckedOut += 1
     }
@@ -346,23 +346,15 @@ function updateRow(button, id) {
     info.loan_id = document.getElementById('loanId' + id).textContent;
     info.loan_date = new Date(document.getElementById('loanDate'+ id).value)
     info.loan_due_date = new Date(document.getElementById('newDueDate'+ id).value);
-    // info.loan_due_date = new Date(info.loan_due_date)
     let diffDays = daysDiff(info.loan_date, info.loan_due_date)
     info.mem_id = currMemId;
-    // info.weight = document.getElementById('newWeight'+ id).value;
-    // if( document.getElementById('newKg' + id).checked){
-    //     info.unit = 1;
-    // } else if ( document.getElementById('newLbs' + id).checked){
-    //     info.unit = 0;
-    // }
-    // info.date = document.getElementById('newDate'+ id).value;
-    // info.id = id;
     req.open('PUT', baseUrl, true);
     req.setRequestHeader('Content-Type', 'application/json');
     req.addEventListener('load',function(){
       if(req.status >= 200 && req.status < 400){
         let response = JSON.parse(req.responseText);
         deleteTable();
+        currLoans = response["loans"]
         makeBooksCheckedOut(response["loans"])
         if (response["loans"].length != 0){
           makeTable(response["loans"]);
@@ -405,7 +397,7 @@ function isDups(membersLoans, book_id){
   for (let i = 0; i < membersLoans.length; i++) {
     // console.log(membersLoans[i].book_id)
     // console.log(book_id)
-    if (membersLoans[i].book_id == book_id) {
+    if (membersLoans[i].book_id == book_id && membersLoans[i].loan_status == 1) {
       return true
     }
   }

@@ -37,13 +37,13 @@ const deleteAuthors= 'DELETE FROM authors WHERE auth_id=?'
 
 // Members page queries
 const getAllMembers = 'SELECT * FROM members' ;
-const insertMemberQuery = "INSERT INTO members (`mem_first_name`, `mem_mid_name`, `mem_last_name`, `mem_email`, `mem_zip_code`, `books_checked_out`) VALUES (?, ?, ?, ?, ?,?)";
+const insertMemberQuery = "INSERT INTO members (`mem_first_name`, `mem_mid_name`, `mem_last_name`, `mem_email`, `mem_zip_code`) VALUES (?, ?, ?, ?, ?)";
 const deleteMemQuery = "DELETE FROM members WHERE mem_id=?";
 const updateMembers = 'UPDATE members SET mem_first_name=?, mem_mid_name=?, mem_last_name=?, mem_email=?, mem_zip_code=? WHERE mem_id=?'
 
 
 // Member Account page queries
-const getAllLoans = `SELECT title, auth_first_name, auth_last_name, loans.loan_id, loan_date, loan_due_date, books.book_id 
+const getAllLoans = `SELECT title, auth_first_name, auth_last_name, loans.loan_id, loan_date, loan_due_date,loan_status, books.book_id 
                     FROM members 
                     JOIN loans ON members.mem_id = loans.mem_id
                     JOIN book_loan ON loans.loan_id = book_loan.loan_id
@@ -66,7 +66,7 @@ const insertLoanQuery =   `INSERT INTO loans (mem_id, loan_date, loan_due_date)
 // const insertResQuery = `INSERT INTO reservations (mem_id, res_date, res_active)
 //                         VALUES (?, ?, ?);`
 const countLoansQuery = `SELECT COUNT(*) FROM loans WHERE mem_id = ?;`
-const updateLoanQuery = 'UPDATE loans SET loan_date=?, loan_due_date=? WHERE loan_id=?';
+const updateLoanQuery = 'UPDATE loans SET loan_date=?, loan_due_date=?, loan_status = ? WHERE loan_id=?';
 const deleteLoanQuery = "DELETE FROM loans WHERE loan_id=?";
 
 // sends the entire table/data back to the client
@@ -377,8 +377,7 @@ app.get('/members',function(req,res,next){
 // POST MEMBERS
 app.post('/members',function(req,res,next){
 var {mem_first_name, mem_mid_name, mem_last_name, mem_email, mem_zip_code, mem_id} = req.body;
-var books_checked_out = 0
-mysql.pool.query(insertMemberQuery, [mem_first_name, mem_mid_name, mem_last_name, mem_email, mem_zip_code, books_checked_out], (err, result) => {
+mysql.pool.query(insertMemberQuery, [mem_first_name, mem_mid_name, mem_last_name, mem_email, mem_zip_code], (err, result) => {
   if(err){
     next(err);
     return;
@@ -403,7 +402,7 @@ mysql.pool.query(deleteMemQuery, mem_id, (err, result) => {
 // GET LOAN and RESERVATIONS
 app.get('/memberAccount',function(req,res,next){
   let mem_id = req.query.mem_id;
-  updateMemLoans(mem_id)
+  // updateMemLoans(mem_id)
   getMemLoans(req.query.mem_id,res);
 });
 
@@ -445,7 +444,7 @@ app.post('/memberAccount',function(req,res,next){
   // console.log(toISOLocal(loan_due_date))
   // loan_due_date = addDays(loan_due_date, 90)
   // loan_due_date = loan_due_date.toISOString().slice(0, 19).replace('T', ' ')
-  console.log(loan_due_date);
+  // console.log(loan_due_date);
   mysql.pool.query(insertLoanQuery, [mem_id, loan_date, loan_due_date, loan_id], (err, result) => {
     if(err){
       next(err);
@@ -458,12 +457,6 @@ app.post('/memberAccount',function(req,res,next){
         return;
       }
 
-      mysql.pool.query('UPDATE members SET books_checked_out = books_checked_out + 1 WHERE mem_id= ?', mem_id, (err, result) => {
-        if(err){
-          next(err);
-          return;
-        }})
-
         getMemLoans(mem_id,res);
     });
   });
@@ -472,14 +465,21 @@ app.post('/memberAccount',function(req,res,next){
 // UPDATE LOAN
 app.put('/memberAccount',function(req,res,next){
   var {loan_id, loan_date, loan_due_date, mem_id} = req.body
+  var loan_status = 1
   // loan_due_date = loan_due_date.slice(0,19).replace('T', ' ');
   loan_date = new Date(loan_date)
-  loan_date = loan_date.toISOString().slice(0, 19).replace('T', ' ')
   loan_due_date = new Date(loan_due_date)
+  let today = new Date
+  let diffTime = (loan_due_date - today)
+  let difference = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  if (difference < 0){
+    loan_status = 0
+  }
+  loan_date = loan_date.toISOString().slice(0, 19).replace('T', ' ')
   loan_due_date = loan_due_date.toISOString().slice(0, 19).replace('T', ' ')
   // console.log(loan_id)
   // console.log(loan_due_date)
-  mysql.pool.query(updateLoanQuery,[loan_date, loan_due_date, loan_id], function(err, result){
+  mysql.pool.query(updateLoanQuery,[loan_date, loan_due_date, loan_status, loan_id], function(err, result){
     if(err){
       next(err);
       return;
