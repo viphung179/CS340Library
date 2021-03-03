@@ -1,4 +1,7 @@
+
 const baseUrl = `http://flip3.engr.oregonstate.edu:5149/books`
+const extraUrl = 'http://flip3.engr.oregonstate.edu:5149/authors'
+
 
 
 // deletes table children elements.
@@ -284,7 +287,7 @@ const displayNewData = () => {
 document.getElementById('auth_id').addEventListener('click', function(event){
     var req = new XMLHttpRequest();
     var select = document.getElementById('select')
-    req.open('GET', 'http://flip3.engr.oregonstate.edu:3103/authors', true);
+    req.open('GET', extraUrl , true);
     req.send(null);
     req.addEventListener('load',function(){
         if(req.status >= 200 && req.status < 400){

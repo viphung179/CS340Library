@@ -1,4 +1,5 @@
 const baseUrl = `http://flip3.engr.oregonstate.edu:5149/memberAccount`;
+const extraUrl = 'http://flip3.engr.oregonstate.edu:5149/books';
 // console.log(localStorage['mem_id']);
 // console.log(localStorage['mem_fname']);
 let currMemId = localStorage['mem_id'];
@@ -492,3 +493,31 @@ function deleteTable(){
   //   resheading.parentNode.removeChild(resheading);
   // }
 }
+
+
+
+// populating drop down menu for book ID for loan book
+document.getElementById('BookId').addEventListener('click', function(event){
+  var req = new XMLHttpRequest();
+  var select = document.getElementById('select')
+  req.open('GET', extraUrl, true);
+  req.send(null);
+  req.addEventListener('load',function(){
+      if(req.status >= 200 && req.status < 400){
+          let response = JSON.parse(req.responseText);
+          data = JSON.parse(response.results)
+          for(let i=0; i<data.length; i++ ) {
+              var menuItem = document.createElement('option')
+              menuItem.textContent = [data[i]['title']];
+              menuItem.value = data[i]['book_id'] ;
+              select.appendChild(menuItem)
+          }
+      } else {
+          console.log("Error in network request: " + req.statusText);
+        }
+  });
+  event.preventDefault();
+  while(select.firstChild){
+      select.removeChild(select.firstChild);
+  }
+})
