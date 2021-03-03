@@ -66,7 +66,8 @@ const insertLoanQuery =   `INSERT INTO loans (mem_id, loan_date, loan_due_date)
 // const insertResQuery = `INSERT INTO reservations (mem_id, res_date, res_active)
 //                         VALUES (?, ?, ?);`
 const countLoansQuery = `SELECT COUNT(*) FROM loans WHERE mem_id = ?;`
-const updateLoanQuery = 'UPDATE loans SET loan_due_date=? WHERE loan_id=?';
+const updateLoanQuery = 'UPDATE loans SET loan_date=?, loan_due_date=? WHERE loan_id=?';
+const deleteLoanQuery = "DELETE FROM loans WHERE loan_id=?";
 
 // sends the entire table/data back to the client
 const getAllData = (res) => {
@@ -143,6 +144,8 @@ const getMemLoans = (req, res) => {
     })
   })
 }
+
+
 
 // const getMemRes = (req, res) => {
 //   mysql.pool.query(getAllRes, req, (err, rows, fields) => {
@@ -400,6 +403,7 @@ mysql.pool.query(deleteMemQuery, mem_id, (err, result) => {
 // GET LOAN and RESERVATIONS
 app.get('/memberAccount',function(req,res,next){
   let mem_id = req.query.mem_id;
+  updateMemLoans(mem_id)
   getMemLoans(req.query.mem_id,res);
 });
 
@@ -467,13 +471,15 @@ app.post('/memberAccount',function(req,res,next){
 
 // UPDATE LOAN
 app.put('/memberAccount',function(req,res,next){
-  var {loan_id, loan_due_date, mem_id} = req.body
+  var {loan_id, loan_date, loan_due_date, mem_id} = req.body
   // loan_due_date = loan_due_date.slice(0,19).replace('T', ' ');
+  loan_date = new Date(loan_date)
+  loan_date = loan_date.toISOString().slice(0, 19).replace('T', ' ')
   loan_due_date = new Date(loan_due_date)
   loan_due_date = loan_due_date.toISOString().slice(0, 19).replace('T', ' ')
   // console.log(loan_id)
   // console.log(loan_due_date)
-  mysql.pool.query(updateLoanQuery,[loan_due_date, loan_id], function(err, result){
+  mysql.pool.query(updateLoanQuery,[loan_date, loan_due_date, loan_id], function(err, result){
     if(err){
       next(err);
       return;
@@ -481,6 +487,20 @@ app.put('/memberAccount',function(req,res,next){
     getMemLoans(mem_id,res);
   });
 });
+
+// DELETE LOAN
+app.delete('/memberAccount',function(req,res,next){
+  var loan_id = req.body.loan_id;
+  var mem_id = req.body.mem_id;
+  mysql.pool.query(deleteLoanQuery, loan_id, (err, result) => {
+    if(err){
+      next(err);
+      return;
+    }
+    getMemLoans(mem_id,res);
+  });
+  });
+
 
 
 // POST RESERVATION
