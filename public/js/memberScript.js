@@ -32,10 +32,10 @@ document.getElementById('signup').addEventListener('click', function(event){
       }});
     
      if(info.mem_first_name !== "" && info.mem_last_name !== "" && info.mem_email !== "" && info.mem_zip_code !== "" ) {
-        if (ValidateEmail(info.mem_email)){
+        if (ValidateEmail(info.mem_email) && ValidateZipCode(info.mem_zip_code)){
           req.send(JSON.stringify(info));
         } else {
-          alert("You have entered an invalid email address.")
+          alert("You have entered an invalid email address or zip code.")
         }
      } else {
        alert("Please enter all required data.")
@@ -297,3 +297,15 @@ function ValidateEmail(mail)
     // alert("You have entered an invalid email address!")
     return (false)
 }
+
+//https://www.w3resource.com/javascript/form/email-validation.php
+function ValidateZipCode(zipCode) 
+{
+ if (/(^\d{5}$)|(^\d{5}-\d{4}$)/.test(zipCode))
+  {
+    return (true)
+  }
+    // alert("You have entered an invalid email address!")
+    return (false)
+}
+/(^\d{5}$)|(^\d{5}-\d{4}$)/
