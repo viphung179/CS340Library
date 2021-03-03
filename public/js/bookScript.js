@@ -1,7 +1,6 @@
 const baseUrl = `http://flip3.engr.oregonstate.edu:3103/books`
 
 
-
 // deletes table children elements.
 const deleteTable = () => { 
     let parent =  document.getElementById("workoutsTable")
@@ -282,9 +281,9 @@ const displayNewData = () => {
 }
 
 // populating drop down menu for author ID for add book
-document.getElementById('dropDownMenu').addEventListener('click', function(event){
+document.getElementById('auth_id').addEventListener('click', function(event){
     var req = new XMLHttpRequest();
-    var menu = document.getElementById('dropDownMenu')
+    var select = document.getElementById('select')
     req.open('GET', 'http://flip3.engr.oregonstate.edu:3103/authors', true);
     req.send(null);
     req.addEventListener('load',function(){
@@ -292,18 +291,19 @@ document.getElementById('dropDownMenu').addEventListener('click', function(event
             let response = JSON.parse(req.responseText);
             data = JSON.parse(response.results)
             for(let i=0; i<data.length; i++ ) {
-                menuItem = document.createElement('option');
-                menuItem.type = 'number';
+                var menuItem = document.createElement('option')
+                menuItem.textContent = [data[i]['auth_first_name'] + ' ' + data[i]['auth_last_name'] ];
                 menuItem.value = data[i]['auth_id'] ;
-                console.log(data[i]['auth_id'])
-                menu.appendChild(menuItem);
+                select.appendChild(menuItem)
             }
-
         } else {
             console.log("Error in network request: " + req.statusText);
           }
     });
     event.preventDefault();
+    while(select.firstChild){
+        select.removeChild(select.firstChild);
+    }
 })
 
 // submits new input data(row) from the user to the database. 
@@ -315,26 +315,36 @@ document.getElementById('addBook').addEventListener('click', function(event){
     payload.auth_id = document.getElementById('auth_id').value;
     payload.year = document.getElementById('year').value;
     payload.copies_available = document.getElementById('copies').value;
+    console.log(payload)
     req.open('POST', baseUrl, true);
     req.setRequestHeader('Content-Type', 'application/json');
     req.addEventListener('load',function(){
       if(req.status >= 200 && req.status < 400){
         let response = JSON.parse(req.responseText);
+        // places text on badge
+        document.getElementById("message").textContent = "Book Added"
         displayNewData();
       } else {
         console.log("Error in network request: " + req.statusText);
       }});
     
-     if(payload.isbn !== "" && payload.title !== "" && payload.auth_id !== "" && payload.year !== "" && payload.year !== "") {
+     if(payload.isbn !== "" && payload.title !== "" && payload.auth_id !== "" && payload.year !== "" && payload.copies_available !== "") {
+        // clears form fields
+        document.getElementById("isbn").value = "";
+        document.getElementById("title").value = "";
+        document.getElementById("auth_id").value = "";
+        document.getElementById("year").value = "";
+        document.getElementById("copies").value = "";
         req.send(JSON.stringify(payload));
+     } else {
+        alert("Please enter all required fields to add a book.")
      }
-    document.getElementById("isbn").value = "";
-    document.getElementById("title").value = "";
-    document.getElementById("auth_id").value = "";
-    document.getElementById("year").value = "";
-    document.getElementById("copies").value = "";
     event.preventDefault();
   });
 
+// removes badge
+document.getElementById('title').addEventListener('click', function(){
+    document.getElementById("message").textContent = ""
+})
 
-// getData();
+displayNewData();
