@@ -135,12 +135,12 @@ function getBooksCheckedOut(loans) {
   }
   for (let i = 0; i < loans.length; i++) {
     // console.log(loans[i].loan_due_date)
-    let dueDate = new Date(loans[i].loan_due_date)
-    let newDate = new Date();
-    let diffTime = (dueDate - newDate)
-    let difference = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    // console.log(difference)
-    if (difference >= 0){
+    // let dueDate = new Date(loans[i].loan_due_date)
+    // let newDate = new Date();
+    // let diffTime = (dueDate - newDate)
+    // let difference = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    // // console.log(difference)
+    if (loans[i].loan_status == 1){
       booksCheckedOut += 1
     }
 
@@ -194,7 +194,7 @@ function makeTable(rows) {
 function makeHeaders(newTable) {
   let header = document.createElement("thead");
   newTable.appendChild(header);
-  let headerName = ['id','Title', 'Author', 'Loan Date', 'Due Date'];
+  let headerName = ['id','Title', 'Author', 'Loan Date', 'Status'];
     for (let c = 0; c < headerName.length; c++){
         let newHeader = document.createElement("th");
         newHeader.textContent = headerName[c];
@@ -210,13 +210,15 @@ function makeHeaders(newTable) {
 function makeRow(rows, newTable){
   let body = document.createElement("tbody");
   newTable.appendChild(body);
+  console.log(rows)
   for (let i = 0; i < rows.length; i++) {
     let newRow = document.createElement("tr");
     newRow.appendChild(createTD("number", rows[i].loan_id, "loanId" + rows[i].loan_id, true));
+    newRow.appendChild(createTD("number", rows[i].book_id, "bookId" + rows[i].loan_id, true));
     newRow.appendChild(createTD("text", rows[i].title, "title" + rows[i].loan_id));
     newRow.appendChild(createTD("text", rows[i].auth_first_name + " " + rows[i].auth_last_name, "authName" + rows[i].loan_id));
     newRow.appendChild(createTD("date", rows[i].loan_date.slice(0,10), "loanDate"+ rows[i].loan_id));
-    newRow.appendChild(createTD("date", rows[i].loan_due_date.slice(0,10), "newDueDate"+ rows[i].loan_id));
+    newRow.appendChild(createTD("number", rows[i].loan_status, "newStatus"+ rows[i].loan_id));
     let updateCell = document.createElement("td");
     let updateButton = document.createElement("button");
     updateButton.textContent = "Update";
@@ -333,20 +335,22 @@ function makeRow(rows, newTable){
 function updateRow(button, id) {
   let currentRow = button.parentNode.parentNode
   let inputs = currentRow.getElementsByTagName("input");
-  for (let i = 0; i < inputs.length; i++) {
-    if (inputs[i].type == 'date'){
+  for (let i = 2; i < inputs.length; i++) {
+    // if (inputs[i].type == 'date'){
     inputs[i].disabled = false;
-  }
+  
   }
   button.textContent = "Done";
 
   button.addEventListener('click', function(){
     let req = new XMLHttpRequest();
-    let info = {loan_id: null, loan_date:null, loan_due_date: null, mem_id: null };
+    let info = {loan_id: null, loan_date:null, loan_status:null, book_id: null, mem_id: null };
     info.loan_id = document.getElementById('loanId' + id).textContent;
+    info.loan_status = document.getElementById('newStatus' + id).value;
     info.loan_date = new Date(document.getElementById('loanDate'+ id).value)
-    info.loan_due_date = new Date(document.getElementById('newDueDate'+ id).value);
-    let diffDays = daysDiff(info.loan_date, info.loan_due_date)
+    info.book_id = document.getElementById('bookId' + id).textContent;
+    // info.loan_due_date = new Date(document.getElementById('newDueDate'+ id).value);
+    // let diffDays = daysDiff(info.loan_date, info.loan_due_date)
     info.mem_id = currMemId;
     req.open('PUT', baseUrl, true);
     req.setRequestHeader('Content-Type', 'application/json');
@@ -363,11 +367,12 @@ function updateRow(button, id) {
         console.log("Error in network request: " + req.statusText);
       }});
     
-    if(diffDays >= 0 && diffDays <= 90) {
-        req.send(JSON.stringify(info));
-    } else {
-      alert("Please select valid dates")
-    }
+    req.send(JSON.stringify(info));
+    // if(diffDays >= 0 && diffDays <= 90) {
+    //     req.send(JSON.stringify(info));
+    // } else {
+    //   alert("Please select valid dates")
+    // }
   })
   
 }
@@ -406,14 +411,14 @@ function isDups(membersLoans, book_id){
 }
 
 //https://stackoverflow.com/questions/3224834/get-difference-between-2-dates-in-javascript
-function daysDiff(loan_date, loan_due_date) {
-  const date1 = new Date(loan_date);
-  const date2 = new Date(loan_due_date);
-  const diffTime = (date2 - date1);
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
-  console.log(diffDays + " days");
-  return diffDays
-}
+// function daysDiff(loan_date, loan_due_date) {
+//   const date1 = new Date(loan_date);
+//   const date2 = new Date(loan_due_date);
+//   const diffTime = (date2 - date1);
+//   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+//   console.log(diffDays + " days");
+//   return diffDays
+// }
 
 function createTD(type, value, id, isID = false) {
   if (isID) {

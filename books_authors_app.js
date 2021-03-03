@@ -43,7 +43,7 @@ const updateMembers = 'UPDATE members SET mem_first_name=?, mem_mid_name=?, mem_
 
 
 // Member Account page queries
-const getAllLoans = `SELECT title, auth_first_name, auth_last_name, loans.loan_id, loan_date, loan_due_date,loan_status, books.book_id 
+const getAllLoans = `SELECT title, auth_first_name, auth_last_name, loans.loan_id, loan_date,loan_status, books.book_id 
                     FROM members 
                     JOIN loans ON members.mem_id = loans.mem_id
                     JOIN book_loan ON loans.loan_id = book_loan.loan_id
@@ -59,14 +59,14 @@ const getAllLoans = `SELECT title, auth_first_name, auth_last_name, loans.loan_i
 //                   AND members.mem_id = ?;`
 const insertBookLoanQuery = `INSERT INTO book_loan (loan_id, book_id)
                             VALUES (?,?);`
-const insertLoanQuery =   `INSERT INTO loans (mem_id, loan_date, loan_due_date)
-                          VALUES (?, ?, ?);`
+const insertLoanQuery =   `INSERT INTO loans (mem_id, loan_date)
+                          VALUES (?, ?);`
 // const insertBookResQuery = `INSERT INTO book_reservation (res_id, book_id)
 //                             VALUES (?,?);`
 // const insertResQuery = `INSERT INTO reservations (mem_id, res_date, res_active)
 //                         VALUES (?, ?, ?);`
 const countLoansQuery = `SELECT COUNT(*) FROM loans WHERE mem_id = ?;`
-const updateLoanQuery = 'UPDATE loans SET loan_date=?, loan_due_date=?, loan_status = ? WHERE loan_id=?';
+const updateLoanQuery = 'UPDATE loans SET loan_date=?, loan_status = ? WHERE loan_id=?';
 const deleteLoanQuery = "DELETE FROM loans WHERE loan_id=?";
 
 // sends the entire table/data back to the client
@@ -439,13 +439,13 @@ app.post('/memberAccount',function(req,res,next){
   var newDate = new Date()
   var loan_date = toISOLocal(newDate).slice(0,19).replace('T', ' ')
   // var loan_date = new Date().toISOString().slice(0, 19).replace('T', ' ');
-  var loan_due_date = toISOLocal(addDays(newDate, 90)).slice(0,19).replace('T', ' ');
+  // var loan_due_date = toISOLocal(addDays(newDate, 90)).slice(0,19).replace('T', ' ');
   // console.log(loan_due_date)
   // console.log(toISOLocal(loan_due_date))
   // loan_due_date = addDays(loan_due_date, 90)
   // loan_due_date = loan_due_date.toISOString().slice(0, 19).replace('T', ' ')
   // console.log(loan_due_date);
-  mysql.pool.query(insertLoanQuery, [mem_id, loan_date, loan_due_date, loan_id], (err, result) => {
+  mysql.pool.query(insertLoanQuery, [mem_id, loan_date], (err, result) => {
     if(err){
       next(err);
       return;
@@ -456,35 +456,52 @@ app.post('/memberAccount',function(req,res,next){
         next(err);
         return;
       }
-
+      mysql.pool.query('UPDATE books SET copies_available = copies_available -1 \
+                        WHERE book_id = ?', book_id, (err, result1) => {
+        if(err){
+          next(err);
+          return;
+        }
         getMemLoans(mem_id,res);
+      });
     });
   });
 });
 
 // UPDATE LOAN
 app.put('/memberAccount',function(req,res,next){
-  var {loan_id, loan_date, loan_due_date, mem_id} = req.body
-  var loan_status = 1
+  var {loan_id, loan_date, loan_status, book_id, mem_id} = req.body
   // loan_due_date = loan_due_date.slice(0,19).replace('T', ' ');
   loan_date = new Date(loan_date)
-  loan_due_date = new Date(loan_due_date)
-  let today = new Date
-  let diffTime = (loan_due_date - today)
-  let difference = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  if (difference < 0){
-    loan_status = 0
-  }
+  // loan_due_date = new Date(loan_due_date)
+  // let today = new Date
+  // let diffTime = (loan_due_date - today)
+  // let difference = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  // if (difference < 0){
+  //   loan_status = 0
+  // }
   loan_date = loan_date.toISOString().slice(0, 19).replace('T', ' ')
-  loan_due_date = loan_due_date.toISOString().slice(0, 19).replace('T', ' ')
+  // loan_due_date = loan_due_date.toISOString().slice(0, 19).replace('T', ' ')
   // console.log(loan_id)
   // console.log(loan_due_date)
-  mysql.pool.query(updateLoanQuery,[loan_date, loan_due_date, loan_status, loan_id], function(err, result){
+  mysql.pool.query(updateLoanQuery,[loan_date, loan_status, loan_id], function(err, result){
     if(err){
       next(err);
       return;
     }
+
+    if (loan_status == 0){
+      mysql.pool.query('UPDATE books SET copies_available = copies_available +1 \
+                        WHERE book_id = ? AND copies_available < 10', book_id, (err, result1) => {
+        if(err){
+          next(err);
+          return;
+        }
+        getMemLoans(mem_id,res);
+    })
+  } else {
     getMemLoans(mem_id,res);
+  }
   });
 });
 
