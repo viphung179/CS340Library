@@ -4,13 +4,13 @@ document.addEventListener('DOMContentLoaded', getdata);
 
 document.getElementById('signup').addEventListener('click', function(event){
     let req = new XMLHttpRequest();
-    let info = {mem_first_name: null, mem_mid_name: null, mem_last_name: null, mem_email: null, mem_zip_code: null, books_checked_out:null};
+    let info = {mem_first_name: null, mem_mid_name: null, mem_last_name: null, mem_email: null, mem_zip_code: null};
     info.mem_first_name = document.getElementById('fname').value;
     info.mem_mid_name = document.getElementById('mname').value;
     info.mem_last_name = document.getElementById('lname').value;
     info.mem_email = document.getElementById('email').value;
     info.mem_zip_code = document.getElementById('zip').value;
-    info.books_checked_out = 0;
+    
     // if( document.getElementById('kg').checked){
     //     info.unit = 1
     // } else if ( document.getElementById('lbs').checked){
@@ -28,10 +28,15 @@ document.getElementById('signup').addEventListener('click', function(event){
         }
       } else {
         console.log("Error in network request: " + req.statusText);
+        alert("This email has already been used.")
       }});
     
      if(info.mem_first_name !== "" && info.mem_last_name !== "" && info.mem_email !== "" && info.mem_zip_code !== "" ) {
-        req.send(JSON.stringify(info));
+        if (ValidateEmail(info.mem_email)){
+          req.send(JSON.stringify(info));
+        } else {
+          alert("You have entered an invalid email address.")
+        }
      } else {
        alert("Please enter all required data.")
      }
@@ -94,18 +99,17 @@ function makeTable(rows) {
     let targetRow = target.parentNode.parentNode
     let targetId = targetRow.firstElementChild.textContent;
     let memFname = targetRow.firstElementChild.nextElementSibling;
-    // console.log(memFname.textContent)
+    // console.log(memFname)
     let memLname = memFname.nextElementSibling.nextElementSibling;
+    // console.log(memLname)
     let booksChecked = memLname.nextElementSibling.nextElementSibling.nextElementSibling;
     // console.log(memFname)
     if (target.tagName != 'BUTTON') return;
     if (target.textContent == "Delete"){
       deleteRow(targetId);
-      // Note: (added target.textContent == "Done") just so when Done button was pressed
-      // it would not be directed to the else condition. 
-    } else if (target.textContent == "Update" || target.textContent == "Done"){
+    } else if (target.textContent == "Update"){
       updateRow(target, targetId);
-    } else {
+    } else if (target.textContent == "View Loans/Reservations") {
       let member = {'mem_id': targetId, 'mem_fname': memFname}
       localStorage.setItem('mem_id', targetId);
       localStorage.setItem('mem_fname', memFname.textContent);
@@ -144,9 +148,6 @@ function makeRow(rows, newTable){
     newRow.appendChild(createTD("text", rows[i].mem_last_name, "lastName" + rows[i].mem_id));
     newRow.appendChild(createTD("email", rows[i].mem_email, "email"+ rows[i].mem_id));
     newRow.appendChild(createTD("text", rows[i].mem_zip_code, "zipCode"+ rows[i].mem_id));
-    // newRow.appendChild(createTD("number", rows[i].books_checked_out, "books"+ rows[i].mem_id));
-    // newRow.appendChild(radioInputs(rows[i].unit,rows[i].id));
-    // newRow.appendChild(createTD("date", rows[i].date.slice(0,10), "newDate"+ rows[i].id));
     let updateCell = document.createElement("td");
     let deleteCell = document.createElement("td");
     let viewCell = document.createElement("td");
@@ -156,7 +157,6 @@ function makeRow(rows, newTable){
     updateButton.textContent = "Update";
     deleteButton.textContent = "Delete";
     viewButton.textContent = "View Loans/Reservations";
-    // viewButton.href = "MemberAccount.html"
     updateButton.classList.add("btn","btn-info");
     deleteButton.classList.add("btn","btn-info");
     viewButton.classList.add("btn","btn-info");
@@ -285,4 +285,15 @@ function deleteTable(){
   if (table !== null) {
     table.parentNode.removeChild(table)
   }
+}
+
+//https://www.w3resource.com/javascript/form/email-validation.php
+function ValidateEmail(mail) 
+{
+ if (/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(mail))
+  {
+    return (true)
+  }
+    // alert("You have entered an invalid email address!")
+    return (false)
 }
