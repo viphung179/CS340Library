@@ -22,6 +22,7 @@ document.getElementById('signup').addEventListener('click', function(event){
     req.addEventListener('load',function(){
       if(req.status >= 200 && req.status < 400){
         let response = JSON.parse(req.responseText);
+        document.getElementById("message").textContent = "Member Added"   // displays badge
         deleteTable()
         if (response["rows"].length != 0){
           makeTable(response["rows"])
@@ -309,3 +310,9 @@ function ValidateZipCode(zipCode)
     return (false)
 }
 /(^\d{5}$)|(^\d{5}-\d{4}$)/
+
+
+// removes badge from display
+document.getElementById('fname').addEventListener('click', function(){
+  document.getElementById("message").textContent = ""
+})

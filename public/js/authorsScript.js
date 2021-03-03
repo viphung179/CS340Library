@@ -291,15 +291,14 @@ document.getElementById('addAuthor').addEventListener('click', function(event){
     req.addEventListener('load',function(){
       if(req.status >= 200 && req.status < 400){
         let response = JSON.parse(req.responseText);
-        // places text on badge
-        document.getElementById("message").textContent = "Author Added"
+        document.getElementById("message").textContent = "Author Added"  // displays badge
         displayNewData();
       } else {
         console.log("Error in network request: " + req.statusText);
       }});
     
      if(payload.auth_first_name !== "" && payload.auth_last_name !== "") {
-        // clears form fields.
+        // clears form fields after form is submitted.
         document.getElementById("fname").value = "";
         document.getElementById("mname").value = "";
         document.getElementById("lname").value = "";

@@ -45,6 +45,7 @@ document.getElementById('loanBook').addEventListener('click', function(event){
     req.addEventListener('load',function(){
       if(req.status >= 200 && req.status < 400){
         let response = JSON.parse(req.responseText);
+        document.getElementById("message").textContent = "Book Loan Successful"  // displays badge
         // alert("helloooo")
         // console.log(response);
         deleteTable()
@@ -579,9 +580,12 @@ document.getElementById('BookId').addEventListener('click', function(event){
           data = JSON.parse(response.results)
           for(let i=0; i<data.length; i++ ) {
               var menuItem = document.createElement('option')
-              menuItem.textContent = [data[i]['title']];
-              menuItem.value = data[i]['book_id'] ;
-              select.appendChild(menuItem)
+              console.log([data[i]['copies_available']])
+              if ([data[i]['copies_available']] != 0){
+                menuItem.textContent = [data[i]['title']];
+                menuItem.value = data[i]['book_id'] ;
+                select.appendChild(menuItem)
+              }
           }
       } else {
           console.log("Error in network request: " + req.statusText);
@@ -591,4 +595,10 @@ document.getElementById('BookId').addEventListener('click', function(event){
   while(select.firstChild){
       select.removeChild(select.firstChild);
   }
+})
+
+
+// removes badge from display
+document.getElementById('BookId').addEventListener('click', function(){
+  document.getElementById("message").textContent = ""
 })

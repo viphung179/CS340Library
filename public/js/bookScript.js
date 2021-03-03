@@ -1,7 +1,5 @@
-
 const baseUrl = `http://flip3.engr.oregonstate.edu:5149/books`
 const extraUrl = 'http://flip3.engr.oregonstate.edu:5149/authors'
-
 
 
 // deletes table children elements.
@@ -222,7 +220,6 @@ const disableRow = (rowId, table) => {
     }
 };
 
-
 // When search button is selected, specified data is retrieved from database.
 document.addEventListener('DOMContentLoaded', getData);
 function getData(){
@@ -324,28 +321,31 @@ document.getElementById('addBook').addEventListener('click', function(event){
     req.addEventListener('load',function(){
       if(req.status >= 200 && req.status < 400){
         let response = JSON.parse(req.responseText);
-        // places text on badge
-        document.getElementById("message").textContent = "Book Added"
+        document.getElementById("message").textContent = "Book Added" // displays badge
         displayNewData();
       } else {
         console.log("Error in network request: " + req.statusText);
       }});
     
      if(payload.isbn !== "" && payload.title !== "" && payload.auth_id !== "" && payload.year !== "" && payload.copies_available !== "") {
-        // clears form fields
-        document.getElementById("isbn").value = "";
-        document.getElementById("title").value = "";
-        document.getElementById("auth_id").value = "";
-        document.getElementById("year").value = "";
-        document.getElementById("copies").value = "";
-        req.send(JSON.stringify(payload));
+         if (payload.copies_available <= 10 && payload.copies_available > 0) {
+            // clears form fields
+            document.getElementById("isbn").value = "";
+            document.getElementById("title").value = "";
+            document.getElementById("auth_id").value = "";
+            document.getElementById("year").value = "";
+            document.getElementById("copies").value = "";
+            req.send(JSON.stringify(payload));
+        } else {
+            alert("Number of copies avaliable must be in the range of 1 to 10 books.")
+        }
      } else {
         alert("Please enter all required fields to add a book.")
      }
     event.preventDefault();
   });
 
-// removes badge
+// removes badge from display
 document.getElementById('title').addEventListener('click', function(){
     document.getElementById("message").textContent = ""
 })
