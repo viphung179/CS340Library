@@ -35,7 +35,8 @@ document.getElementById('loanBook').addEventListener('click', function(event){
     let req = new XMLHttpRequest();
     let books= document.getElementById('books').textContent
     let info = {book_id: null, mem_id: currMemId};
-    info.book_id = document.getElementById('bookID').value;
+    info.book_id = document.getElementById('BookId').value;
+    console.log(info.book_id)
     // console.log(isDups(currLoans, info.book_id));
     // deleteTable()
     req.open('POST', baseUrl, true);
@@ -177,12 +178,15 @@ function makeTable(rows) {
 
   newTable.addEventListener('click',function(event){
     let target = event.target;
-    // console.log(target.parentNode.parentNode)
+    // console.log(target)
     let targetId = target.parentNode.parentNode.firstElementChild.textContent;
+    // console.log('targetID', targetId)
+    let targetStatus = document.getElementById("newStatus" + targetId).value
+    // console.log("targetat",targetStatus.value)
     // console.log(targetId)
     if (target.tagName != 'BUTTON') return;
     if (target.textContent == "Delete"){
-      deleteRow(targetId);
+      deleteRow(targetId, targetStatus);
     } else if (target.textContent == "Update") {
       updateRow(target, targetId);
       // console.log(target.parentNode.textContent)
@@ -214,12 +218,49 @@ function makeRow(rows, newTable){
   console.log(rows)
   for (let i = 0; i < rows.length; i++) {
     let newRow = document.createElement("tr");
-    newRow.appendChild(createTD("number", rows[i].loan_id, "loanId" + rows[i].loan_id, true));
-    newRow.appendChild(createTD("number", rows[i].book_id, "bookId" + rows[i].loan_id, true));
-    newRow.appendChild(createTD("text", rows[i].title, "title" + rows[i].loan_id));
-    newRow.appendChild(createTD("text", rows[i].auth_first_name + " " + rows[i].auth_last_name, "authName" + rows[i].loan_id));
-    newRow.appendChild(createTD("date", rows[i].loan_date.slice(0,10), "loanDate"+ rows[i].loan_id));
-    newRow.appendChild(createTD("number", rows[i].loan_status, "newStatus"+ rows[i].loan_id));
+    let loan_id = createTD("number", rows[i].loan_id, "loanId" + rows[i].loan_id, true);
+    let book_id = createTD("number", rows[i].book_id, "bookId" + rows[i].loan_id, true)
+    let title = createTD("text", rows[i].title, "title" + rows[i].loan_id)
+    let author_name = createTD("text", rows[i].auth_first_name + " " + rows[i].auth_last_name, "authName" + rows[i].loan_id)
+    let loan_date = createTD("date", rows[i].loan_date.slice(0,10), "loanDate"+ rows[i].loan_id)
+    let loan_status = document.createElement('td') //createTD("number", rows[i].loan_status, "newStatus"+ rows[i].loan_id)
+
+    var _form = loan_status.appendChild(document.createElement('form')),
+    statusInput = _form.appendChild(document.createElement('input')),
+    statusDatalist = _form.appendChild(document.createElement('datalist'));
+
+
+    statusDatalist.id = 'statusList' + rows[i].loan_id;
+    statusInput.id = "newStatus" + rows[i].loan_id
+    // statusInput.textContent = "anactive"
+    statusInput.setAttribute('list','statusList' + rows[i].loan_id);
+
+    
+    statusInput.disabled = true;
+    let active = document.createElement('option')
+    active.value = 'Active'
+    active.textContent = 'Active'
+    let inactive = document.createElement('option')
+    inactive.value = 'Inactive'
+    inactive.textContent = "Inactive"
+    statusDatalist.appendChild(active)
+    statusDatalist.appendChild(inactive)
+    
+    newRow.appendChild(loan_id);
+    newRow.appendChild(book_id);
+    newRow.appendChild(title);
+    newRow.appendChild(author_name);
+    newRow.appendChild(loan_date);
+    newRow.appendChild(loan_status);
+    if (rows[i].loan_status == 0) {
+      inactive.setAttribute("selected", "selected")
+      statusInput.value = "Inactive"
+    } else {
+      active.setAttribute("selected", "selected")
+      statusInput.value = "Active"
+    }
+
+
     let updateCell = document.createElement("td");
     let updateButton = document.createElement("button");
     updateButton.textContent = "Update";
@@ -335,19 +376,46 @@ function makeRow(rows, newTable){
 
 function updateRow(button, id) {
   let currentRow = button.parentNode.parentNode
-  let inputs = currentRow.getElementsByTagName("input");
-  for (let i = 2; i < inputs.length; i++) {
-    // if (inputs[i].type == 'date'){
-    inputs[i].disabled = false;
-  
+  let loanDateStatus = document.getElementById('loanDate'+id)
+  let loanStatus = document.getElementById('newStatus' + id)
+  let save_status = document.getElementById('newStatus' + id).value;
+
+  if (save_status == "Inactive") {
+    save_status = 0
+  } else {
+    save_status = 1
   }
+
+  if (loanStatus.value == "Active"){
+    let status = document.getElementById('newStatus' + id);
+    status.value = ''
+    loanDateStatus.disabled = false
+    loanStatus.disabled = false
+  } else {
+    loanDateStatus.disabled = false
+  }
+
+  // for (let i = 2; i < inputs.length-1; i++) {
+  //   // if (inputs[i].type == 'date'){
+  //   inputs[i].disabled = false;
+  
+  // }
   button.textContent = "Done";
+  
+  
 
   button.addEventListener('click', function(){
     let req = new XMLHttpRequest();
     let info = {loan_id: null, loan_date:null, loan_status:null, book_id: null, mem_id: null };
     info.loan_id = document.getElementById('loanId' + id).textContent;
     info.loan_status = document.getElementById('newStatus' + id).value;
+    if (info.loan_status == 'Inactive') {
+      info.loan_status = 0;
+    } else if (info.loan_status == 'Active') {
+      info.loan_status = 1;
+    } else {
+      info.loan_status = save_status
+    }
     info.loan_date = new Date(document.getElementById('loanDate'+ id).value)
     info.book_id = document.getElementById('bookId' + id).textContent;
     // info.loan_due_date = new Date(document.getElementById('newDueDate'+ id).value);
@@ -368,6 +436,7 @@ function updateRow(button, id) {
         console.log("Error in network request: " + req.statusText);
       }});
     
+    
     req.send(JSON.stringify(info));
     // if(diffDays >= 0 && diffDays <= 90) {
     //     req.send(JSON.stringify(info));
@@ -378,9 +447,11 @@ function updateRow(button, id) {
   
 }
 
-function deleteRow(rowID) {
+function deleteRow(rowID, rowStatus) {
   let req = new XMLHttpRequest();
-  let info = {mem_id:currMemId, loan_id: rowID };
+  console.log("rowStatus", rowStatus)
+  let info = {mem_id:currMemId, loan_id: rowID, loan_status: rowStatus, book_id:null};
+  info.book_id = document.getElementById('bookId' + rowID).textContent;
   req.open('DELETE', baseUrl, true);
   req.setRequestHeader('Content-Type', 'application/json');
   req.addEventListener('load',function(){

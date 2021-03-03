@@ -499,9 +499,9 @@ app.put('/memberAccount',function(req,res,next){
         }
         getMemLoans(mem_id,res);
     })
-  } else {
-    getMemLoans(mem_id,res);
-  }
+    } else {
+      getMemLoans(mem_id,res);
+    }
   });
 });
 
@@ -509,12 +509,26 @@ app.put('/memberAccount',function(req,res,next){
 app.delete('/memberAccount',function(req,res,next){
   var loan_id = req.body.loan_id;
   var mem_id = req.body.mem_id;
+  var loan_status = req.body.loan_status;
+  var book_id = req.body.book_id
   mysql.pool.query(deleteLoanQuery, loan_id, (err, result) => {
     if(err){
       next(err);
       return;
     }
-    getMemLoans(mem_id,res);
+
+    if (loan_status == "Active"){
+      mysql.pool.query('UPDATE books SET copies_available = copies_available + 1 \
+                        WHERE book_id = ? AND copies_available < 10', book_id, (err, result1) => {
+        if(err){
+          next(err);
+          return;
+        }
+        getMemLoans(mem_id,res);
+    })
+    } else {
+      getMemLoans(mem_id,res);
+    }
   });
   });
 
