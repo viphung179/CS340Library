@@ -10,13 +10,6 @@ document.getElementById('signup').addEventListener('click', function(event){
     info.mem_last_name = document.getElementById('lname').value;
     info.mem_email = document.getElementById('email').value;
     info.mem_zip_code = document.getElementById('zip').value;
-    
-    // if( document.getElementById('kg').checked){
-    //     info.unit = 1
-    // } else if ( document.getElementById('lbs').checked){
-    //     info.unit = 0
-    // }
-    // info.date = document.getElementById('date').value;
     req.open('POST', baseUrl, true);
     req.setRequestHeader('Content-Type', 'application/json');
     req.addEventListener('load',function(){
@@ -45,6 +38,7 @@ document.getElementById('signup').addEventListener('click', function(event){
     event.preventDefault();
   });
 
+// Search members
 document.getElementById('search').addEventListener('click', function(event){
   let req = new XMLHttpRequest();
   let nameSearch = document.getElementById('nameSearch').value;
@@ -56,7 +50,6 @@ document.getElementById('search').addEventListener('click', function(event){
       deleteTable()
       if (response["rows"].length != 0){
         makeTable(response["rows"]);
-        // console.log(response["rows"]);
       }
     } else {
       console.log('Error in network request: ' + req.statusText);
@@ -67,7 +60,7 @@ document.getElementById('search').addEventListener('click', function(event){
   event.preventDefault();
 });
 
-
+// get members list
 function getdata() {
   let req = new XMLHttpRequest();
   req.open('GET', baseUrl, true);
@@ -85,6 +78,7 @@ function getdata() {
   req.send(null);
 }
 
+// make members table
 function makeTable(rows) {
   let newTable = document.createElement("table");
   newTable.id = 'table';
@@ -122,6 +116,7 @@ function makeTable(rows) {
   })
 }
 
+// make table headers
 function makeHeaders(newTable) {
   let header = document.createElement("thead");
   newTable.appendChild(header);
@@ -138,6 +133,7 @@ function makeHeaders(newTable) {
     }
 }
 
+// make members row
 function makeRow(rows, newTable){
   let body = document.createElement("tbody");
   newTable.appendChild(body);
@@ -171,6 +167,7 @@ function makeRow(rows, newTable){
   }
 }
 
+// delete member
 function deleteRow(rowID) {
   let req = new XMLHttpRequest();
   let info = {id: rowID };
@@ -190,6 +187,7 @@ function deleteRow(rowID) {
   req.send(JSON.stringify(info));
 }
 
+// update member
 function updateRow(button, id) {
   let currentRow = button.parentNode.parentNode
   let inputs = currentRow.getElementsByTagName("input");
@@ -255,32 +253,7 @@ function createTD(type, value, id, isID = false) {
   }
 }
 
-// function radioInputs(value,id) {
-//   let radios = document.createElement("span");
-//   let kgRadio = document.createElement("INPUT");
-//   let kgText = document.createTextNode("Kg");
-//   kgRadio.mem_first_name = id;
-//   kgRadio.type = "radio";
-//   kgRadio.id = "newKg" + id;
-//   let lbsRadio = document.createElement("INPUT");
-//   let lbsText = document.createTextNode("Lbs");
-//   lbsRadio.mem_first_name = id;
-//   lbsRadio.type = "radio";
-//   lbsRadio.id = "newLbs" + id;
-//   if (value === 0) {
-//     lbsRadio.checked = true;
-//   } else {
-//     kgRadio.checked = true;
-//   }
-//   kgRadio.disabled = true;
-//   lbsRadio.disabled = true;
-//   radios.appendChild(kgRadio);
-//   radios.appendChild(kgText);
-//   radios.appendChild(lbsRadio);
-//   radios.appendChild(lbsText);
-//   return radios
-// }
-
+// delete members table
 function deleteTable(){
   let table = document.querySelector("table");
   if (table !== null) {
@@ -288,7 +261,10 @@ function deleteTable(){
   }
 }
 
-//https://www.w3resource.com/javascript/form/email-validation.php
+// Citation for ValidateEmail:
+// Date: 03/03/2021
+// Copied from /OR/ Adapted from /OR/ Based on:
+// Source URL: https://www.w3resource.com/javascript/form/email-validation.php
 function ValidateEmail(mail) 
 {
  if (/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(mail))
@@ -299,7 +275,10 @@ function ValidateEmail(mail)
     return (false)
 }
 
-//https://www.w3resource.com/javascript/form/email-validation.php
+// Citation for ValidateZipCode:
+// Date: 03/03/2021
+// Copied from /OR/ Adapted from /OR/ Based on:
+// Source URL: https://www.w3resource.com/javascript/form/email-validation.php
 function ValidateZipCode(zipCode) 
 {
  if (/(^\d{5}$)|(^\d{5}-\d{4}$)/.test(zipCode))
@@ -309,8 +288,6 @@ function ValidateZipCode(zipCode)
     // alert("You have entered an invalid email address!")
     return (false)
 }
-/(^\d{5}$)|(^\d{5}-\d{4}$)/
-
 
 // removes badge from display
 document.getElementById('fname').addEventListener('click', function(){
