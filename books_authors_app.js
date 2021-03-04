@@ -393,7 +393,11 @@ function toISOLocal(d) {
 
 // POST LOAN
 app.post('/memberAccount',function(req,res,next){
-  var {book_id, mem_id, loan_id} = req.body;
+  var {mem_id, booksIdSelected} = req.body;
+  // console.log(req.body)
+  // console.log(booksIdSelected)
+  console.log(typeof booksIdSelected[0])
+  console.log(booksIdSelected.length)
   var newDate = new Date()
   var loan_date = toISOLocal(newDate).slice(0,19).replace('T', ' ')
   mysql.pool.query(insertLoanQuery, [mem_id, loan_date], (err, result) => {
@@ -402,21 +406,28 @@ app.post('/memberAccount',function(req,res,next){
       return;
     }
 
-    mysql.pool.query(insertBookLoanQuery, [String(result.insertId), book_id], (err, result1) => {
-      if(err){
-        next(err);
-        return;
-      }
-      mysql.pool.query('UPDATE books SET copies_available = copies_available -1 \
-                        WHERE book_id = ?', book_id, (err, result1) => {
+    for ( let i = 0; i < booksIdSelected.length; i++){
+      mysql.pool.query(insertBookLoanQuery, [String(result.insertId), booksIdSelected[i]], (err, result1) => {
         if(err){
           next(err);
           return;
         }
-        getMemLoans(mem_id,res);
+
+        mysql.pool.query('UPDATE books SET copies_available = copies_available -1 \
+                          WHERE book_id = ?', booksIdSelected[i], (err, result1) => {
+          if(err){
+            next(err);
+            return;
+          }
+
+          if (i == booksIdSelected.length - 1) {
+            getMemLoans(mem_id,res);
+          }
+
+        });
       });
-    });
-  });
+    }
+  })
 });
 
 // UPDATE LOAN

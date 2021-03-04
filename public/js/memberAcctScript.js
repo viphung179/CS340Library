@@ -28,9 +28,12 @@ document.addEventListener('DOMContentLoaded', getdata);
 // make a book loan
 document.getElementById('loanBook').addEventListener('click', function(event){
     let req = new XMLHttpRequest();
-    let books= document.getElementById('books').textContent
-    let info = {book_id: null, mem_id: currMemId};
-    info.book_id = document.getElementById('BookId').value;
+    let booksCount= document.getElementById('books').textContent
+    let info = {mem_id: currMemId, booksIdSelected: null};
+    let book1 = document.getElementById('BookId1').value;
+    let book2 = document.getElementById('BookId2').value;
+    let book3 = document.getElementById('BookId3').value;
+    info.booksIdSelected = getBookList([book1,book2,book3]);
     console.log(info.book_id)
     req.open('POST', baseUrl, true);
     req.setRequestHeader('Content-Type', 'application/json');
@@ -49,21 +52,49 @@ document.getElementById('loanBook').addEventListener('click', function(event){
         alert("This book ID is not available")
         console.log("Error in network request: " + req.statusText);
       }});
-    
-     if(info.book_id !== '') {
-       if (books >= 5) {
-         alert("The max amount of books currently checked out has been reached.")
-       } else {
-         if (isDups(currLoans, info.book_id) === true) {
-           alert("This book is in your current loans list.")
-         } else {
-           req.send(JSON.stringify(info));
+
+    if (info.booksIdSelected.length != 0) {
+      if (hasDuplicates(info.booksIdSelected)) {
+        alert("Please select all different books")
+      } else {
+        if (parseInt(booksCount) + info.booksIdSelected.length > 5) {
+          // console.log("length", booksCount + info.booksIdSelected.length)
+          // console.log(parseInt(booksCount), info.booksIdSelected.length)
+          alert("You currently have "+ booksCount +" checked out. The max number of books that can be checked out is 5. Please select fewer books")
+        } else {
+          if(isDups(currLoans, info.booksIdSelected)){
+            alert("One or more of your book selection is already in your current loans list.")
+          } else {
+            req.send(JSON.stringify(info));
           }
         }
       }
+    }
+    
     event.preventDefault();
   });
 
+// get book inputs
+function getBookList(bookList){
+  console.log("orig", bookList)
+  let result = [];
+  for (var book in bookList ) {
+    console.log(book)
+    if(bookList[book] != ''){
+      result.push(parseInt(bookList[book]));
+    }
+  }
+  console.log("booklist", result)
+  return result
+}
+
+https://www.techiedelight.com/check-array-contains-duplicates-javascript/
+function hasDuplicates(arr)
+{
+    return new Set(arr).size !== arr.length; 
+}
+ 
+ 
 // get member's loans
 function getdata() {
   let req = new XMLHttpRequest();
@@ -313,12 +344,16 @@ function deleteRow(rowID, rowStatus) {
 // check if book is already in member's current loans
 function isDups(membersLoans, book_id){
   console.log(membersLoans)
+  console.log(book_id)
+  let result = false
   for (let i = 0; i < membersLoans.length; i++) {
-    if (membersLoans[i].book_id == book_id && membersLoans[i].loan_status == 1) {
-      return true
+    console.log(membersLoans[i].book_id in book_id)
+    if (book_id.includes(membersLoans[i].book_id) && membersLoans[i].loan_status == 1) {
+      
+      result = true
     }
   }
-  return false
+  return result
 }
 
 function createTD(type, value, id, isID = false) {
