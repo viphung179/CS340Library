@@ -46,6 +46,7 @@ document.getElementById('loanBook').addEventListener('click', function(event){
           makeTable(response["loans"]);
         }
       } else {
+        alert("This book ID is not available")
         console.log("Error in network request: " + req.statusText);
       }});
     
@@ -71,6 +72,7 @@ function getdata() {
       if (req.status >= 200 && req.status < 400){
         let response = JSON.parse(req.responseText);
         currLoans = response["loans"];
+        // console.log(currLoans)
         makeBooksCheckedOut(response["loans"])
         if (response["loans"].length != 0){
           makeTable(response["loans"]);
@@ -164,7 +166,7 @@ function makeHeaders(newTable) {
 function makeRow(rows, newTable){
   let body = document.createElement("tbody");
   newTable.appendChild(body);
-  console.log(rows)
+  // console.log(rows)
   for (let i = 0; i < rows.length; i++) {
     let newRow = document.createElement("tr");
     let loan_id = createTD("number", rows[i].loan_id, "loanId" + rows[i].loan_id, true);
@@ -371,7 +373,7 @@ document.getElementById('BookId').addEventListener('click', function(event){
           data = JSON.parse(response.results)
           for(let i=0; i<data.length; i++ ) {
               var menuItem = document.createElement('option')
-              console.log([data[i]['copies_available']])
+              // console.log([data[i]['copies_available']])
               if ([data[i]['copies_available']] != 0){
                 menuItem.textContent = [data[i]['title']];
                 menuItem.value = data[i]['book_id'] ;
