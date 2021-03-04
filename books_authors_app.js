@@ -42,7 +42,7 @@ const deleteMemQuery = "DELETE FROM members WHERE mem_id=?";
 const updateMembers = 'UPDATE members SET mem_first_name=?, mem_mid_name=?, mem_last_name=?, mem_email=?, mem_zip_code=? WHERE mem_id=?'
 
 // Member Account page queries
-const getAllLoans = `SELECT title, auth_first_name, auth_last_name, loans.loan_id, loan_date,loan_status, books.book_id 
+const getAllLoans = `SELECT title, auth_first_name, auth_last_name, loans.loan_id, loan_date, book_loan.loan_status, books.book_id 
                     FROM members 
                     JOIN loans ON members.mem_id = loans.mem_id
                     JOIN book_loan ON loans.loan_id = book_loan.loan_id
@@ -53,8 +53,11 @@ const insertBookLoanQuery = `INSERT INTO book_loan (loan_id, book_id)
                             VALUES (?,?);`
 const insertLoanQuery =   `INSERT INTO loans (mem_id, loan_date)
                           VALUES (?, ?);`
-const updateLoanQuery = 'UPDATE loans SET loan_date=?, loan_status = ? WHERE loan_id=?';
-const deleteLoanQuery = "DELETE FROM loans WHERE loan_id=?";
+const updateLoanQuery = `UPDATE loans JOIN book_loan ON loans.loan_id = book_loan.loan_id
+                        SET loan_date=?, book_loan.loan_status = ? 
+                        WHERE book_loan.loan_id=? AND book_id = ? `;
+const deleteLoanQuery = `DELETE FROM book_loan 
+                        WHERE loan_id=? and book_id =?`;
 
 // sends the entire table/data back to the client
 const getAllData = (res) => {
@@ -115,6 +118,7 @@ let memLoanRes = {}
 const getMemLoans = (req, res) => {
   mysql.pool.query(getAllLoans, req, (err, rows, fields) => {
     if (err) {
+      console.log(req)
       console.log('get mems loan')
       next(err);
       return;
@@ -435,7 +439,7 @@ app.put('/memberAccount',function(req,res,next){
   var {loan_id, loan_date, loan_status, book_id, mem_id} = req.body
   loan_date = new Date(loan_date)
   loan_date = loan_date.toISOString().slice(0, 19).replace('T', ' ')
-  mysql.pool.query(updateLoanQuery,[loan_date, loan_status, loan_id], function(err, result){
+  mysql.pool.query(updateLoanQuery,[loan_date, loan_status, loan_id, book_id], function(err, result){
     if(err){
       next(err);
       return;
@@ -462,7 +466,7 @@ app.delete('/memberAccount',function(req,res,next){
   var mem_id = req.body.mem_id;
   var loan_status = req.body.loan_status;
   var book_id = req.body.book_id
-  mysql.pool.query(deleteLoanQuery, loan_id, (err, result) => {
+  mysql.pool.query(deleteLoanQuery, [loan_id, book_id], (err, result) => {
     if(err){
       next(err);
       return;

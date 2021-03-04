@@ -60,7 +60,7 @@ document.getElementById('loanBook').addEventListener('click', function(event){
         if (parseInt(booksCount) + info.booksIdSelected.length > 5) {
           // console.log("length", booksCount + info.booksIdSelected.length)
           // console.log(parseInt(booksCount), info.booksIdSelected.length)
-          alert("You currently have "+ booksCount +" checked out. The max number of books that can be checked out is 5. Please select fewer books")
+          alert("You currently have "+ booksCount +" checked out. The max number of books that can be checked out is 5. Please select fewer books.")
         } else {
           if(isDups(currLoans, info.booksIdSelected)){
             alert("One or more of your book selection is already in your current loans list.")
@@ -158,13 +158,16 @@ function makeTable(rows) {
 
   newTable.addEventListener('click',function(event){
     let target = event.target;
+    if (target.tagName != 'BUTTON') return;
     // console.log(target)
-    let targetId = target.parentNode.parentNode.firstElementChild.textContent;
+    let loanId = target.parentNode.parentNode.firstElementChild.textContent
+    let bookId = target.parentNode.parentNode.firstElementChild.nextElementSibling.textContent
+    let targetId = loanId + bookId;
     // console.log('targetID', targetId)
     let targetStatus = document.getElementById("newStatus" + targetId).value
     // console.log("targetat",targetStatus.value)
     // console.log(targetId)
-    if (target.tagName != 'BUTTON') return;
+    
     if (target.textContent == "Delete"){
       deleteRow(targetId, targetStatus);
     } else if (target.textContent == "Update") {
@@ -200,20 +203,20 @@ function makeRow(rows, newTable){
   // console.log(rows)
   for (let i = 0; i < rows.length; i++) {
     let newRow = document.createElement("tr");
-    let loan_id = createTD("number", rows[i].loan_id, "loanId" + rows[i].loan_id, true);
-    let book_id = createTD("number", rows[i].book_id, "bookId" + rows[i].loan_id, true)
-    let title = createTD("text", rows[i].title, "title" + rows[i].loan_id)
-    let author_name = createTD("text", rows[i].auth_first_name + " " + rows[i].auth_last_name, "authName" + rows[i].loan_id)
-    let loan_date = createTD("date", rows[i].loan_date.slice(0,10), "loanDate"+ rows[i].loan_id)
+    let loan_id = createTD("number", rows[i].loan_id, "loanId" + rows[i].loan_id + rows[i].book_id, true);
+    let book_id = createTD("number", rows[i].book_id, "bookId" + rows[i].loan_id + rows[i].book_id, true)
+    let title = createTD("text", rows[i].title, "title" + rows[i].loan_id + rows[i].book_id)
+    let author_name = createTD("text", rows[i].auth_first_name + " " + rows[i].auth_last_name, "authName" + rows[i].loan_id + rows[i].book_id)
+    let loan_date = createTD("date", rows[i].loan_date.slice(0,10), "loanDate"+ rows[i].loan_id + rows[i].book_id)
     
     // create loan_status drop down
     let loan_status = document.createElement('td')
     var _form = loan_status.appendChild(document.createElement('form')),
     statusInput = _form.appendChild(document.createElement('input')),
     statusDatalist = _form.appendChild(document.createElement('datalist'));
-    statusDatalist.id = 'statusList' + rows[i].loan_id;
-    statusInput.id = "newStatus" + rows[i].loan_id
-    statusInput.setAttribute('list','statusList' + rows[i].loan_id);
+    statusDatalist.id = 'statusList' + rows[i].loan_id + rows[i].book_id;
+    statusInput.id = "newStatus" + rows[i].loan_id + rows[i].book_id
+    statusInput.setAttribute('list','statusList' + rows[i].loan_id + rows[i].book_id);
     statusInput.disabled = true;
     let active = document.createElement('option')
     active.value = 'Active'
@@ -280,8 +283,6 @@ function updateRow(button, id) {
 
   button.textContent = "Done";
   
-  
-
   button.addEventListener('click', function(){
     let req = new XMLHttpRequest();
     let info = {loan_id: null, loan_date:null, loan_status:null, book_id: null, mem_id: null };
@@ -296,6 +297,7 @@ function updateRow(button, id) {
     }
     info.loan_date = new Date(document.getElementById('loanDate'+ id).value)
     info.book_id = document.getElementById('bookId' + id).textContent;
+    console.log(info.loan_id, info.book_id)
     info.mem_id = currMemId;
     req.open('PUT', baseUrl, true);
     req.setRequestHeader('Content-Type', 'application/json');
@@ -320,9 +322,10 @@ function updateRow(button, id) {
 // delete loan
 function deleteRow(rowID, rowStatus) {
   let req = new XMLHttpRequest();
-  console.log("rowStatus", rowStatus)
-  let info = {mem_id:currMemId, loan_id: rowID, loan_status: rowStatus, book_id:null};
+  // console.log("rowStatus", rowStatus)
+  let info = {mem_id:currMemId, loan_id: null, loan_status: rowStatus, book_id:null};
   info.book_id = document.getElementById('bookId' + rowID).textContent;
+  info.loan_id = document.getElementById('loanId' + rowID).textContent;
   req.open('DELETE', baseUrl, true);
   req.setRequestHeader('Content-Type', 'application/json');
   req.addEventListener('load',function(){
