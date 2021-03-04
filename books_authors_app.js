@@ -41,7 +41,6 @@ const insertMemberQuery = "INSERT INTO members (`mem_first_name`, `mem_mid_name`
 const deleteMemQuery = "DELETE FROM members WHERE mem_id=?";
 const updateMembers = 'UPDATE members SET mem_first_name=?, mem_mid_name=?, mem_last_name=?, mem_email=?, mem_zip_code=? WHERE mem_id=?'
 
-
 // Member Account page queries
 const getAllLoans = `SELECT title, auth_first_name, auth_last_name, loans.loan_id, loan_date,loan_status, books.book_id 
                     FROM members 
@@ -50,22 +49,10 @@ const getAllLoans = `SELECT title, auth_first_name, auth_last_name, loans.loan_i
                     JOIN books ON book_loan.book_id = books.book_id
                     JOIN authors ON books.auth_id = authors.auth_id
                     AND members.mem_id = ?;`
-// const getAllRes = `SELECT title, auth_first_name, auth_last_name, res_date, res_active
-//                   FROM members 
-//                   JOIN reservations ON members.mem_id = reservations.mem_id
-//                   JOIN book_reservation ON reservations.res_id = book_reservation.res_id
-//                   JOIN books ON book_reservation.book_id = books.book_id
-//                   JOIN authors ON books.auth_id = authors.auth_id
-//                   AND members.mem_id = ?;`
 const insertBookLoanQuery = `INSERT INTO book_loan (loan_id, book_id)
                             VALUES (?,?);`
 const insertLoanQuery =   `INSERT INTO loans (mem_id, loan_date)
                           VALUES (?, ?);`
-// const insertBookResQuery = `INSERT INTO book_reservation (res_id, book_id)
-//                             VALUES (?,?);`
-// const insertResQuery = `INSERT INTO reservations (mem_id, res_date, res_active)
-//                         VALUES (?, ?, ?);`
-const countLoansQuery = `SELECT COUNT(*) FROM loans WHERE mem_id = ?;`
 const updateLoanQuery = 'UPDATE loans SET loan_date=?, loan_status = ? WHERE loan_id=?';
 const deleteLoanQuery = "DELETE FROM loans WHERE loan_id=?";
 
@@ -133,30 +120,10 @@ const getMemLoans = (req, res) => {
       return;
     }
 
-    mysql.pool.query(countLoansQuery, req, (err, loanCount, fields) => {
-      if (err) {
-        console.log('count error')
-        next(err);
-        return;
-      }
-      memLoanRes.loans = rows
-      res.json({'loans': memLoanRes.loans});
-    })
+    memLoanRes.loans = rows
+    res.json({'loans': memLoanRes.loans});
   })
 }
-
-
-
-// const getMemRes = (req, res) => {
-//   mysql.pool.query(getAllRes, req, (err, rows, fields) => {
-//     if (err) {
-//       next(err)
-//       return;
-//     }
-//     memLoanRes.reserv = rows;
-//     res.json({'loans': memLoanRes.loans,'reserv': memLoanRes.reserv});
-//   })
-// }
 
 // GET route for BOOKS
 app.get('/books',function(req,res,next){
@@ -348,7 +315,6 @@ app.post('/books',function(req,res,next){
   });
 });
 
-
 // POST route for AUTHORS
 app.post('/authors',function(req,res,next){
   var context = {};
@@ -382,7 +348,6 @@ mysql.pool.query(insertMemberQuery, [mem_first_name, mem_mid_name, mem_last_name
     next(err);
     return;
   }
-  // console.log(result)
   getMemAllData(res);
 });
 });
@@ -402,20 +367,13 @@ mysql.pool.query(deleteMemQuery, mem_id, (err, result) => {
 // GET LOAN and RESERVATIONS
 app.get('/memberAccount',function(req,res,next){
   let mem_id = req.query.mem_id;
-  // updateMemLoans(mem_id)
-  getMemLoans(req.query.mem_id,res);
+  getMemLoans(mem_id,res);
 });
 
-
-// from https://stackoverflow.com/questions/563406/add-days-to-javascript-date
-function addDays(date, days) {
-  var result = new Date(date);
-  result.setDate(result.getDate() + days);
-  return result;
-}
-
-
-//https://stackoverflow.com/questions/49330139/date-toisostring-but-local-time-instead-of-utc
+// Citation for toISOLocal:
+// Date: 03/03/2021
+// Copied from /OR/ Adapted from /OR/ Based on:
+// Source URL: https://stackoverflow.com/questions/49330139/date-toisostring-but-local-time-instead-of-utc
 function toISOLocal(d) {
   var z  = n =>  ('0' + n).slice(-2);
   var zz = n => ('00' + n).slice(-3);
@@ -438,13 +396,6 @@ app.post('/memberAccount',function(req,res,next){
   var {book_id, mem_id, loan_id} = req.body;
   var newDate = new Date()
   var loan_date = toISOLocal(newDate).slice(0,19).replace('T', ' ')
-  // var loan_date = new Date().toISOString().slice(0, 19).replace('T', ' ');
-  // var loan_due_date = toISOLocal(addDays(newDate, 90)).slice(0,19).replace('T', ' ');
-  // console.log(loan_due_date)
-  // console.log(toISOLocal(loan_due_date))
-  // loan_due_date = addDays(loan_due_date, 90)
-  // loan_due_date = loan_due_date.toISOString().slice(0, 19).replace('T', ' ')
-  // console.log(loan_due_date);
   mysql.pool.query(insertLoanQuery, [mem_id, loan_date], (err, result) => {
     if(err){
       next(err);
@@ -471,19 +422,8 @@ app.post('/memberAccount',function(req,res,next){
 // UPDATE LOAN
 app.put('/memberAccount',function(req,res,next){
   var {loan_id, loan_date, loan_status, book_id, mem_id} = req.body
-  // loan_due_date = loan_due_date.slice(0,19).replace('T', ' ');
   loan_date = new Date(loan_date)
-  // loan_due_date = new Date(loan_due_date)
-  // let today = new Date
-  // let diffTime = (loan_due_date - today)
-  // let difference = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  // if (difference < 0){
-  //   loan_status = 0
-  // }
   loan_date = loan_date.toISOString().slice(0, 19).replace('T', ' ')
-  // loan_due_date = loan_due_date.toISOString().slice(0, 19).replace('T', ' ')
-  // console.log(loan_id)
-  // console.log(loan_due_date)
   mysql.pool.query(updateLoanQuery,[loan_date, loan_status, loan_id], function(err, result){
     if(err){
       next(err);
@@ -531,31 +471,6 @@ app.delete('/memberAccount',function(req,res,next){
     }
   });
   });
-
-
-
-// POST RESERVATION
-// app.post('/memberAccountres',function(req,res,next){
-//   var {book_id, mem_id, res_id} = req.body;
-//   var res_date = new Date().toISOString().slice(0, 19).replace('T', ' ');
-//   var res_active = true;
-//   mysql.pool.query(insertResQuery, [mem_id, res_date, res_active, res_id], (err, result) => {
-//     if(err){
-//       next(err);
-//       return;
-//     }
-
-//     mysql.pool.query(insertBookResQuery, [String(result.insertId), book_id], (err, result1) => {
-//       if(err){
-//         next(err);
-//         return;
-//       }
-
-//       getMemLoans(mem_id,res);
-//     });
-//   });
-// });
-
 
 // deletes BOOKS instance.
 app.delete('/books',function(req,res,next){
@@ -619,8 +534,6 @@ app.put('/authors',function(req,res,next){
     getAllData(res);
   });
 });
-
-
 
 app.use(function(req,res){
   res.status(404);
