@@ -88,7 +88,7 @@ function getBookList(bookList){
   return result
 }
 
-https://www.techiedelight.com/check-array-contains-duplicates-javascript/
+//https://www.techiedelight.com/check-array-contains-duplicates-javascript/
 function hasDuplicates(arr)
 {
     return new Set(arr).size !== arr.length; 
@@ -173,9 +173,9 @@ function makeTable(rows) {
     } else if (target.textContent == "Update") {
       updateRow(target, targetId);
       // console.log(target.parentNode.textContent)
-    } else {
-      localStorage.setItem('objectToPass', targetId);
-    }
+    } //else {
+    //   deleteLoan(loanId);
+    // }
   })
 }
 
@@ -203,7 +203,7 @@ function makeRow(rows, newTable){
   // console.log(rows)
   for (let i = 0; i < rows.length; i++) {
     let newRow = document.createElement("tr");
-    let loan_id = createTD("number", rows[i].loan_id, "loanId" + rows[i].loan_id + rows[i].book_id, true);
+    let loan_id = createTD("number", rows[i].loan_id, "loanId" + rows[i].loan_id + rows[i].book_id);
     let book_id = createTD("number", rows[i].book_id, "bookId" + rows[i].loan_id + rows[i].book_id, true)
     let title = createTD("text", rows[i].title, "title" + rows[i].loan_id + rows[i].book_id)
     let author_name = createTD("text", rows[i].auth_first_name + " " + rows[i].auth_last_name, "authName" + rows[i].loan_id + rows[i].book_id)
@@ -250,12 +250,19 @@ function makeRow(rows, newTable){
     
     let deleteCell = document.createElement("td");
     let deleteButton = document.createElement("button");
-    deleteButton.textContent = "Delete";
+    deleteButton.textContent = "Delete book from loan";
     deleteButton.classList.add("btn","btn-info");
     deleteCell.appendChild(deleteButton);
 
+    // let deleteLoanCell = document.createElement("td");
+    // let deleteLoanButton = document.createElement("button");
+    // deleteLoanButton.textContent = "Delete Loan "+ rows[i].loan_id;
+    // deleteLoanButton.classList.add("btn","btn-info");
+    // deleteLoanCell.appendChild(deleteLoanButton);
+
     newRow.appendChild(updateCell);
     newRow.appendChild(deleteCell);
+    // newRow.appendChild(deleteLoanCell);
     body.appendChild(newRow);
   }
 }
@@ -319,19 +326,21 @@ function updateRow(button, id) {
   
 }
 
-// delete loan
+// delete book from loan
 function deleteRow(rowID, rowStatus) {
   let req = new XMLHttpRequest();
   // console.log("rowStatus", rowStatus)
   let info = {mem_id:currMemId, loan_id: null, loan_status: rowStatus, book_id:null};
   info.book_id = document.getElementById('bookId' + rowID).textContent;
   info.loan_id = document.getElementById('loanId' + rowID).textContent;
+  let bookTitle = document.getElementById('title' + rowID).textContent;
   req.open('DELETE', baseUrl, true);
   req.setRequestHeader('Content-Type', 'application/json');
   req.addEventListener('load',function(){
     if(req.status >= 200 && req.status < 400){
       let response = JSON.parse(req.responseText);
       currLoans = response["loans"]
+      alert(bookTitle + " has been deleted from loan "+ info.loan_id + ".")
       deleteTable();
       makeBooksCheckedOut(response["loans"])
       if (response["loans"].length != 0){
@@ -344,7 +353,42 @@ function deleteRow(rowID, rowStatus) {
   req.send(JSON.stringify(info));
 }
 
+// // delete whole loan
+// function deleteLoan(loanID) {
+
+//   let req = new XMLHttpRequest();
+//   // console.log("rowStatus", rowStatus)
+//   let activeLoanBooksIds = []
+//   for(var i = 0; i < currLoans.length; i++){
+//     if (currLoans[i].loan_id == loanID && currLoans[i].loan_status == 1){
+//       activeLoanBooksIds.push(currLoans[i].book_id)
+//     }
+//   }
+
+//   let info = {mem_id:currMemId, loan_id: loanID, active_book_ids:activeLoanBooksIds};
+
+//   req.open('DELETE', baseUrl+"Loans", true);
+//   req.setRequestHeader('Content-Type', 'application/json');
+//   req.addEventListener('load',function(event){
+//     if(req.status >= 200 && req.status < 400){
+//       let response = JSON.parse(req.responseText);
+//       currLoans = response["loans"]
+//       alert("Loan " + loanID + "has been deleted.")
+//       deleteTable();
+//       makeBooksCheckedOut(response["loans"])
+//       if (response["loans"].length != 0){
+//         makeTable(response["loans"]);
+//       }
+//     } else {
+//       console.log("Error in network request: " + req.statusText);
+//     }});
+  
+//   req.send(JSON.stringify(info));
+// }
+
 // check if book is already in member's current loans
+
+
 function isDups(membersLoans, book_id){
   console.log(membersLoans)
   console.log(book_id)
