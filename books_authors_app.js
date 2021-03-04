@@ -400,8 +400,8 @@ app.post('/memberAccount',function(req,res,next){
   var {mem_id, booksIdSelected} = req.body;
   // console.log(req.body)
   // console.log(booksIdSelected)
-  console.log(typeof booksIdSelected[0])
-  console.log(booksIdSelected.length)
+  // console.log(typeof booksIdSelected[0])
+  // console.log(booksIdSelected.length)
   var newDate = new Date()
   var loan_date = toISOLocal(newDate).slice(0,19).replace('T', ' ')
   mysql.pool.query(insertLoanQuery, [mem_id, loan_date], (err, result) => {

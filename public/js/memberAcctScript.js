@@ -88,7 +88,10 @@ function getBookList(bookList){
   return result
 }
 
-//https://www.techiedelight.com/check-array-contains-duplicates-javascript/
+// Citation for hasDuplicates:
+// Date: 03/04/2021
+// Copied from /OR/ Adapted from /OR/ Based on:
+// Source URL:https://www.techiedelight.com/check-array-contains-duplicates-javascript/
 function hasDuplicates(arr)
 {
     return new Set(arr).size !== arr.length; 
@@ -159,23 +162,15 @@ function makeTable(rows) {
   newTable.addEventListener('click',function(event){
     let target = event.target;
     if (target.tagName != 'BUTTON') return;
-    // console.log(target)
     let loanId = target.parentNode.parentNode.firstElementChild.textContent
     let bookId = target.parentNode.parentNode.firstElementChild.nextElementSibling.textContent
     let targetId = loanId + bookId;
-    // console.log('targetID', targetId)
     let targetStatus = document.getElementById("newStatus" + targetId).value
-    // console.log("targetat",targetStatus.value)
-    // console.log(targetId)
-    
     if (target.textContent == "Delete"){
       deleteRow(targetId, targetStatus);
     } else if (target.textContent == "Update") {
       updateRow(target, targetId);
-      // console.log(target.parentNode.textContent)
-    } //else {
-    //   deleteLoan(loanId);
-    // }
+    }
   })
 }
 
@@ -183,7 +178,7 @@ function makeTable(rows) {
 function makeHeaders(newTable) {
   let header = document.createElement("thead");
   newTable.appendChild(header);
-  let headerName = ['id','Title', 'Author', 'Loan Date', 'Status'];
+  let headerName = ['Loan Id','Title', 'Author', 'Loan Date', 'Status'];
     for (let c = 0; c < headerName.length; c++){
         let newHeader = document.createElement("th");
         newHeader.textContent = headerName[c];
@@ -250,7 +245,7 @@ function makeRow(rows, newTable){
     
     let deleteCell = document.createElement("td");
     let deleteButton = document.createElement("button");
-    deleteButton.textContent = "Delete book from loan";
+    deleteButton.textContent = "Delete";
     deleteButton.classList.add("btn","btn-info");
     deleteCell.appendChild(deleteButton);
 
@@ -326,10 +321,9 @@ function updateRow(button, id) {
   
 }
 
-// delete book from loan
+// delete book loan
 function deleteRow(rowID, rowStatus) {
   let req = new XMLHttpRequest();
-  // console.log("rowStatus", rowStatus)
   let info = {mem_id:currMemId, loan_id: null, loan_status: rowStatus, book_id:null};
   info.book_id = document.getElementById('bookId' + rowID).textContent;
   info.loan_id = document.getElementById('loanId' + rowID).textContent;
@@ -340,7 +334,7 @@ function deleteRow(rowID, rowStatus) {
     if(req.status >= 200 && req.status < 400){
       let response = JSON.parse(req.responseText);
       currLoans = response["loans"]
-      alert(bookTitle + " has been deleted from loan "+ info.loan_id + ".")
+      alert(bookTitle + " has been deleted from loans.")
       deleteTable();
       makeBooksCheckedOut(response["loans"])
       if (response["loans"].length != 0){
@@ -352,42 +346,6 @@ function deleteRow(rowID, rowStatus) {
   
   req.send(JSON.stringify(info));
 }
-
-// // delete whole loan
-// function deleteLoan(loanID) {
-
-//   let req = new XMLHttpRequest();
-//   // console.log("rowStatus", rowStatus)
-//   let activeLoanBooksIds = []
-//   for(var i = 0; i < currLoans.length; i++){
-//     if (currLoans[i].loan_id == loanID && currLoans[i].loan_status == 1){
-//       activeLoanBooksIds.push(currLoans[i].book_id)
-//     }
-//   }
-
-//   let info = {mem_id:currMemId, loan_id: loanID, active_book_ids:activeLoanBooksIds};
-
-//   req.open('DELETE', baseUrl+"Loans", true);
-//   req.setRequestHeader('Content-Type', 'application/json');
-//   req.addEventListener('load',function(event){
-//     if(req.status >= 200 && req.status < 400){
-//       let response = JSON.parse(req.responseText);
-//       currLoans = response["loans"]
-//       alert("Loan " + loanID + "has been deleted.")
-//       deleteTable();
-//       makeBooksCheckedOut(response["loans"])
-//       if (response["loans"].length != 0){
-//         makeTable(response["loans"]);
-//       }
-//     } else {
-//       console.log("Error in network request: " + req.statusText);
-//     }});
-  
-//   req.send(JSON.stringify(info));
-// }
-
-// check if book is already in member's current loans
-
 
 function isDups(membersLoans, book_id){
   console.log(membersLoans)
