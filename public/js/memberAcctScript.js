@@ -362,7 +362,9 @@ function deleteTable(){
 }
 
 // populating drop down menu for book ID for loan book
-document.getElementById('BookId').addEventListener('click', function(event){
+let = dropDownMenus = document.getElementsByClassName('form-control')
+for (i = 0; i < dropDownMenus.length; i++) {
+  dropDownMenus[i].addEventListener('click', function(event){
   var req = new XMLHttpRequest();
   var select = document.getElementById('select')
   req.open('GET', extraUrl, true);
@@ -389,9 +391,10 @@ document.getElementById('BookId').addEventListener('click', function(event){
       select.removeChild(select.firstChild);
   }
 })
+}
 
 // removes badge from display
-document.getElementById('BookId').addEventListener('click', function(){
+document.getElementById('BookId1').addEventListener('click', function(){
   document.getElementById("message").textContent = ""
 })
 
