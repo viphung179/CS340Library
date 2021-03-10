@@ -69,7 +69,6 @@ function getdata() {
         let response = JSON.parse(req.responseText);
         if (response["rows"].length != 0){
           makeTable(response["rows"]);
-          // console.log(response["rows"]);
         }
       } else {
         console.log('Error in network request: ' + req.statusText);
@@ -281,7 +280,7 @@ function ValidateEmail(mail)
 // Source URL: https://www.w3resource.com/javascript/form/email-validation.php
 function ValidateZipCode(zipCode) 
 {
- if (/(^\d{5}$)|(^\d{5}-\d{4}$)/.test(zipCode))
+ if (/(^\d{5}$)/.test(zipCode))
   {
     return (true)
   }

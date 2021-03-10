@@ -97,7 +97,6 @@ function hasDuplicates(arr)
     return new Set(arr).size !== arr.length; 
 }
  
- 
 // get member's loans
 function getdata() {
   let req = new XMLHttpRequest();
