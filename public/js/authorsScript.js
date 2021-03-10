@@ -48,7 +48,7 @@ const makeRow = (rowData, table) => {
     deleteButton(row, rowData);
 };
 
-// creates 4 inputs containg data either from the database or from the client.
+// creates 4 inputs(Author attributes) containg data either from the database or from the client.
 const makeInput = (type1, value1, cell) => {
     let input = document.createElement("input");
     let label = document.createElement("label");
@@ -90,7 +90,7 @@ const updateButton = (row, rowData, table) => {
     row.appendChild(aCell);
    
 
-    // if update button is clicked, done button is created ad row is enabled for user input.
+    // if update button is clicked, done button is created and row is enabled for user input.
     upButton.addEventListener("click", function(event){
         let rowId = rowData["auth_id"]
         row.removeChild(row.children[4]);
@@ -111,7 +111,7 @@ const updateButton = (row, rowData, table) => {
     }   
 )};
 
-// sends client's new/updated input data to the database.
+//  PUT request: sends client's new/updated input data(Author attributes) to the database.
 const doneUpdate = (rowData, table) => {
         let rowId = rowData["auth_id"]
         console.log("id: ", rowId)
@@ -147,7 +147,7 @@ const doneUpdate = (rowData, table) => {
         }
 };
 
-// creates delete button and if clicked, deletes selected row(data) from the database. 
+// DELETE request: creates delete button and if clicked, deletes selected row(Authors) from the database. 
 const deleteButton = (row, rowData,) => {
     let bCell = document.createElement("td");
     let delButton = document.createElement("button");
@@ -191,7 +191,7 @@ const enableRow = (rowId, table) => {
         }
 };
 
-// disables rows
+// disables rows.
 const disableRow = (rowId, table) => {
     let numElement = table.childElementCount
     for(let i=1; i< numElement; i++ ){
@@ -204,7 +204,7 @@ const disableRow = (rowId, table) => {
     }
 };
 
-// GET REQUEST
+// GET request: When search button (Search Author) is selected, specified data is retrieved from database.
 document.addEventListener('DOMContentLoaded', getData);
 function getData(){
     document.getElementById('searchAuthor').addEventListener('click', function(event){
@@ -253,7 +253,7 @@ const displayNewData = () => {
     });
 }
 
-// populating drop down menu for author ID for add book
+// populates drop down menu with author IDs when searching for an author.
 document.getElementById('auth_id').addEventListener('click', function(event){
     var req = new XMLHttpRequest();
     var select = document.getElementById('select')
@@ -279,7 +279,7 @@ document.getElementById('auth_id').addEventListener('click', function(event){
     }
 })
 
-// POST request
+// POST request: adds new input data(adds Author) from the user to the database. 
 document.getElementById('addAuthor').addEventListener('click', function(event){
     let req = new XMLHttpRequest();
     let payload = {auth_first_name:null, auth_mid_name:null, auth_last_name:null};
@@ -310,7 +310,7 @@ document.getElementById('addAuthor').addEventListener('click', function(event){
     event.preventDefault();
   });
 
-// removes badge 
+// removes badge.
 document.getElementById('fname').addEventListener('click', function(){
     document.getElementById("message").textContent = ""
 })
