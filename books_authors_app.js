@@ -469,12 +469,36 @@ app.delete('/authors',function(req,res,next){
 
 // DELETE MEMBERS
 app.delete('/members',function(req,res,next){
+  var context ={};
   var mem_id = req.body.id;
+
+  // checks all active book loans_status before member is deleted, and increments copies_available by 1.
+  mysql.pool.query(getAllLoans, mem_id, (err, rows, fields) => {
+    if (err) {
+      next(err);
+      return;
+    }
+    context.results = rows
+    loans = context.results
+    for ( let i = 0; i < loans.length; i++){
+        let bookId = loans[i].book_id
+        if (loans[i].loan_status == 1){
+          mysql.pool.query('UPDATE books SET copies_available = copies_available +1 \
+                            WHERE book_id = ? AND copies_available < 10', bookId, (err, result1) => {
+            if(err){
+              next(err);
+              return;
+            }
+        })}
+    }
+  });
+  // deletes member 
   mysql.pool.query(deleteMemQuery, mem_id, (err, result) => {
     if(err){
       next(err);
       return;
     }
+
     getMemAllData(res);
   });
   });
